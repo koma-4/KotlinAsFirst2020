@@ -67,7 +67,7 @@ fun cube(x:Double) = x * x * x
  * Рассчитать время в секундах, прошедшее с начала суток (30035 в данном случае).
  */
 fun seconds(hours: Int, minutes: Int, seconds: Int) =
-    (hours * 3600 + minutes * 60 + seconds)
+    hours * 3600 + minutes * 60 + seconds
 
 
 
@@ -131,7 +131,7 @@ fun travelMinutes(hoursDepart: Int, minutesDepart: Int, hoursArrive: Int, minute
  */
 fun accountInThreeYears(initial: Int, percent: Int): Double {
     val change = 1.0 + percent / 100.0
-    return (initial * cube(change))
+    return initial * cube(change)
 }
 
 
@@ -145,5 +145,5 @@ fun numberRevert(number: Int): Int {
     val ones = (number % 10) * 100
     val tens = ((number / 10) % 10) * 10
     val hundreds = (number / 100)
-    return (ones + tens + hundreds)
+    return ones + tens + hundreds
 }
