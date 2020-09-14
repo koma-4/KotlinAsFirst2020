@@ -6,6 +6,7 @@ import lesson1.task1.sqr
 import kotlin.math.abs
 import kotlin.math.sqrt
 
+
 /**
  * Пример
  *
@@ -40,19 +41,10 @@ fun queenThreatens(x1: Int, y1: Int, x2: Int, y2: Int): Boolean =
  */
 fun daysInMonth(month: Int, year: Int): Int {
     return when (month) {
-        1 -> 31
+        1, 3, 5, 7, 8, 10, 12 -> 31
         2 -> if ((year % 100 % 4 == 0) && (year % 100 != 0) || (year % 400 == 0)) 29
         else 28
-        3 -> 31
-        4 -> 30
-        5 -> 31
-        6 -> 30
-        7 -> 31
-        8 -> 31
-        9 -> 30
-        10 -> 31
-        11 -> 30
-        else -> 31
+        else -> 30
     }
 }
 
@@ -81,7 +73,7 @@ fun circleInside(
  * кирпич 4 х 4 х 4 пройдёт через отверстие 4 х 4.
  * Вернуть true, если кирпич пройдёт
  */
-fun brickPasses(a: Int, b: Int, c: Int, r: Int, s: Int): Boolean {
-    return (a <= r && b <= s || a <= s && b <= r || a <= r && c <= s
-            || a <= s && c <= r || b <= r && c <= s || b <= s && c <= r)
-}
+fun brickPasses(a: Int, b: Int, c: Int, r: Int, s: Int): Boolean = a <= r && b <= s || a <= s && b <= r
+        || a <= r && c <= s || a <= s && c <= r || b <= r && c <= s || b <= s && c <= r
+
+

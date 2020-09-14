@@ -6,6 +6,20 @@ import lesson1.task1.discriminant
 import kotlin.math.max
 import kotlin.math.sqrt
 import kotlin.math.abs
+fun max(a: Int, b: Int, c: Int, d: Int): Int {
+    return when {
+        (d > b) && ((b > c) || (b > a)) -> d
+        else -> b
+    }
+}
+
+fun min(a: Int, b: Int, c: Int, d: Int): Int {
+    return when {
+        (a < c) && ((c < b) && (b < d) || (c < d) && (d < b)) -> a
+        else -> c
+    }
+}
+
 fun sqr(x: Double) = x * x
 
 // Урок 2: ветвления (здесь), логический тип (см. 2.2).
@@ -71,14 +85,13 @@ fun minBiRoot(a: Double, b: Double, c: Double): Double {
  * вернуть строку вида: «21 год», «32 года», «12 лет».
  */
 fun ageDescription(age: Int): String {
-    if (age < 15 && age > 10 || age > 110 && age < 115 )
-        return "$age лет"
-    else if (age % 10 == 1) return "$age год"
-    else if (age % 10 > 1 && age % 10 < 5)
-        return "$age года"
-    else return "$age лет"
+    return when {
+        age in 11..14 || age in 111..116 -> "$age лет"
+        age % 10 == 1 -> "$age год"
+        age % 10 in 2..4 -> "$age года"
+        else -> "$age лет"
+    }
 }
-
 
 /**
  * Простая (2 балла)
@@ -93,10 +106,11 @@ fun timeForHalfWay(
     t3: Double, v3: Double
 ): Double {
     val halfWay = (v1 * t1 + v2 * t2 + v3 * t3) / 2
-    if (halfWay <= v1 * t1) return halfWay / v1
-    else if (halfWay <= v1 * t1 + v2 * t2)
-        return (halfWay - v1 * t1) / v2 + t1
-    else return t1 + t2 + (halfWay - v1 * t1 - v2 * t2) / v3
+    return when {
+        halfWay <= v1 * t1 -> halfWay / v1
+        halfWay <= v1 * t1 + v2 * t2 -> (halfWay - v1 * t1) / v2 + t1
+        else -> t1 + t2 + (halfWay - v1 * t1 - v2 * t2) / v3
+    }
 }
 
 /**
@@ -113,14 +127,12 @@ fun whichRookThreatens(
     rookX1: Int, rookY1: Int,
     rookX2: Int, rookY2: Int
 ): Int {
-    if ((abs(kingX) == abs(rookX1) || abs(kingY) == abs(rookY1))
-        && (abs(kingX) == abs(rookX2) || abs(kingY) == abs(rookY2)))
-        return 3
-    else if (abs(kingX) == abs(rookX1) || abs(kingY) == abs(rookY1))
-        return 1
-    else if (abs(kingX) == abs(rookX2) || abs(kingY) == abs(rookY2))
-        return 2
-    else return 0
+    val a = abs(kingX) == abs(rookX1) || abs(kingY) == abs(rookY1)
+    val b = abs(kingX) == abs(rookX2) || abs(kingY) == abs(rookY2)
+    return if (a && b) 3
+    else if (a) 1
+    else if (b) 2
+    else 0
 }
 
 /**
@@ -138,14 +150,12 @@ fun rookOrBishopThreatens(
     rookX: Int, rookY: Int,
     bishopX: Int, bishopY: Int
 ): Int {
-    if ((abs(kingX) == abs(rookX) || abs(kingY) == abs(rookY))
-        && (abs(kingX - bishopX) == abs(kingY - bishopY)))
-        return 3
-    else if (abs(kingX) == abs(rookX) || abs(kingY) == abs(rookY))
-        return 1
-    else if (abs(kingX - bishopX) == abs(kingY - bishopY))
-        return 2
-    else return 0
+    val a = abs(kingX) == abs(rookX) || abs(kingY) == abs(rookY)
+    val b = abs(kingX - bishopX) == abs(kingY - bishopY)
+    return if (a && b) 3
+    else if (a) 1
+    else if (b) 2
+    else 0
 }
 
 /**
@@ -168,9 +178,12 @@ fun triangleKind(a: Double, b: Double, c: Double): Int = TODO()
  * Если пересечения нет, вернуть -1.
  */
 fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int {
-    if (c > b || a > d) return -1
-    else if (b > d && (d > c) && c > a) return d - c
-    else if (d > b && (b > a) && a > c) return b - a
-    else if (b > d && (d > a) && a > c) return d - a
-    else return b - c
+    return if (c > b || a > d) -1
+    else if (b == c || a == b || c == d || a == d) 0
+    else if (max(a, b, c, d) == b && min(a, b, c, d) == a) d - c
+    else if (max(a, b, c, d) == d && min(a, b, c, d) == c) b - a
+    else if (max(a, b, c, d) == b && min(a, b, c, d) == c) d - a
+    else b - c
 }
+
+
