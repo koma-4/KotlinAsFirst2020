@@ -6,19 +6,9 @@ import lesson1.task1.discriminant
 import kotlin.math.max
 import kotlin.math.sqrt
 import kotlin.math.abs
-fun max(a: Int, b: Int, c: Int, d: Int): Int {
-    return when {
-        (d > b) && ((b > c) || (b > a)) -> d
-        else -> b
-    }
-}
+import kotlin.math.min
 
-fun min(a: Int, b: Int, c: Int, d: Int): Int {
-    return when {
-        (a < c) && ((c < b) && (b < d) || (c < d) && (d < b)) -> a
-        else -> c
-    }
-}
+
 
 fun sqr(x: Double) = x * x
 
@@ -129,10 +119,12 @@ fun whichRookThreatens(
 ): Int {
     val a = abs(kingX) == abs(rookX1) || abs(kingY) == abs(rookY1)
     val b = abs(kingX) == abs(rookX2) || abs(kingY) == abs(rookY2)
-    return if (a && b) 3
-    else if (a) 1
-    else if (b) 2
-    else 0
+    return when {
+        a && b -> 3
+        a -> 1
+        b -> 2
+        else -> 0
+    }
 }
 
 /**
@@ -152,12 +144,13 @@ fun rookOrBishopThreatens(
 ): Int {
     val a = abs(kingX) == abs(rookX) || abs(kingY) == abs(rookY)
     val b = abs(kingX - bishopX) == abs(kingY - bishopY)
-    return if (a && b) 3
-    else if (a) 1
-    else if (b) 2
-    else 0
+    return when {
+        a && b -> 3
+        a -> 1
+        b -> 2
+        else -> 0
+    }
 }
-
 /**
  * Простая (2 балла)
  *
@@ -178,12 +171,13 @@ fun triangleKind(a: Double, b: Double, c: Double): Int = TODO()
  * Если пересечения нет, вернуть -1.
  */
 fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int {
-    return if (c > b || a > d) -1
-    else if (b == c || a == b || c == d || a == d) 0
-    else if (max(a, b, c, d) == b && min(a, b, c, d) == a) d - c
-    else if (max(a, b, c, d) == d && min(a, b, c, d) == c) b - a
-    else if (max(a, b, c, d) == b && min(a, b, c, d) == c) d - a
-    else b - c
+    val x = min(b, d)
+    val y = max(a, c)
+    return when {
+        c > b || a > d -> -1
+        else -> x - y
 }
+}
+
 
 
