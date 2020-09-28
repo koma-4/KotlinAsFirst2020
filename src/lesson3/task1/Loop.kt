@@ -124,16 +124,16 @@ fun fib(n: Int): Int {
  */
 fun minDivisor(n: Int): Int {
     var minD = 1
-    for (i in 2..n) {
+    for (i in 2..sqrt(n.toDouble()).toInt()) {
         if (n % i == 0) {
             minD = i
-            break
+            return minD
         }
     }
-    return minD
+    return n
 }
 
-/**
+/*
  * Простая (2 балла)
  *
  * Для заданного числа n > 1 найти максимальный делитель, меньший n
