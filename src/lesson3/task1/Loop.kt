@@ -7,6 +7,17 @@ import kotlin.math.pow
 
 fun sqr(x: Int) = x * x
 
+fun commonPart(m: Int, n: Int): Int {
+    var gcf1 = m
+    var gcf2 = n
+    while (gcf1 != 0 && gcf2 != 0) {
+        if (gcf1 > gcf2) gcf1 -= gcf2
+        else gcf2 -= gcf1
+    }
+    return gcf1
+}
+
+
 // Урок 3: циклы
 // Максимальное количество баллов = 9
 // Рекомендуемое количество баллов = 7
@@ -129,12 +140,7 @@ fun minDivisor(n: Int): Int {
  */
 fun maxDivisor(n: Int): Int {
     var minD = 1
-    for (i in 2..n) {
-        if (n % i == 0) {
-            minD = i
-            break
-        }
-    }
+    minD = minDivisor(n)
     return n / minD
 }
 
@@ -173,14 +179,8 @@ fun collatzSteps(x: Int): Int {
  */
 fun lcm(m: Int, n: Int): Int {
     var gcf1 = m
-    var gcf2 = n
-    var lcm = 0
-    while (gcf1 != 0 && gcf2 != 0) {
-        if (gcf1 > gcf2) gcf1 -= gcf2
-        else gcf2 -= gcf1
-    }
-    lcm = m * n / gcf1
-    return lcm
+    gcf1 = commonPart(m, n)
+    return m * n / gcf1
 }
 
 /**
@@ -192,11 +192,7 @@ fun lcm(m: Int, n: Int): Int {
  */
 fun isCoPrime(m: Int, n: Int): Boolean {
     var gcf1 = m
-    var gcf2 = n
-    while (gcf1 != 0 && gcf2 != 0) {
-        if (gcf1 > gcf2) gcf1 -= gcf2
-        else gcf2 -= gcf1
-    }
+    gcf1 = commonPart(m, n)
     return gcf1 == 1
 }
 
@@ -222,13 +218,13 @@ fun squareBetweenExists(m: Int, n: Int): Boolean {
  * Использовать операции со строками в этой задаче запрещается.
  */
 fun revert(n: Int): Int {
-    var new = n % 10
+    var new = n % 10.0
     var number = n
     while (number > 0) {
         number /= 10
-        new = new * 10 + number % 10
+        new = new * 10.0 + number % 10.0
     }
-    return new / 10
+    return (new / 10.0).toInt()
 }
 
 /**
