@@ -204,13 +204,13 @@ fun squareBetweenExists(m: Int, n: Int): Boolean {
  * Использовать операции со строками в этой задаче запрещается.
  */
 fun revert(n: Int): Int {
-    var new = n % 10.0
+    var new = 0
     var number = n
     while (number > 0) {
+        new = new * 10 + number % 10
         number /= 10
-        new = new * 10.0 + number % 10.0
     }
-    return (new / 10.0).toInt()
+    return new
 }
 
 /**
