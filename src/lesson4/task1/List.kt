@@ -3,19 +3,8 @@
 package lesson4.task1
 
 import lesson1.task1.discriminant
-import lesson1.task1.sqr
 import kotlin.math.sqrt
 import kotlin.math.pow
-
-fun splitting(n: Int): MutableList<Int> {
-    val new = mutableListOf<Int>()
-    val number = mutableListOf(n)
-    while (number.isNotEmpty()) {
-        new.add(number.last())
-        number.removeAt(number.indexOf(number.last()))
-    }
-    return new
-}
 
 
 // Урок 4: списки
