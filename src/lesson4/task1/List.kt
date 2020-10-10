@@ -7,6 +7,7 @@ import kotlin.math.sqrt
 import kotlin.math.pow
 
 
+
 // Урок 4: списки
 // Максимальное количество баллов = 12
 // Рекомендуемое количество баллов = 8
@@ -143,12 +144,9 @@ fun mean(list: List<Double>): Double {
  * Обратите внимание, что данная функция должна изменять содержание списка list, а не его копии.
  */
 fun center(list: MutableList<Double>): MutableList<Double> {
-    if (list.isNotEmpty()) {
-        val am = list.sum() / list.size
-        for (i in 0 until list.size) {
-            val element = list[i]
-            list[i] = element - am
-        }
+    val am = list.sum() / list.size
+    for (i in 0 until list.size) {
+        list[i] -= am
     }
     return list
 }
@@ -161,13 +159,13 @@ fun center(list: MutableList<Double>): MutableList<Double> {
  * C = a1b1 + a2b2 + ... + aNbN. Произведение пустых векторов считать равным 0.
  */
 fun times(a: List<Int>, b: List<Int>): Int {
-    val result = mutableListOf<Int>()
-    for (element1 in a) {
-        for (element2 in b) {
-            if (a.indexOf(element1) == b.indexOf(element2)) result.add(element1 * element2)
-        }
+    var result = 0
+    var n = 0
+    for (element in a) {
+        result += element * b[n]
+        n += 1
     }
-    return result.sum()
+    return result
 }
 
 /**
@@ -179,14 +177,11 @@ fun times(a: List<Int>, b: List<Int>): Int {
  * Значение пустого многочлена равно 0 при любом x.
  */
 fun polynom(p: List<Int>, x: Int): Int {
-    val result = mutableListOf<Int>()
-    if (p.isEmpty()) return 0
-    else {
-        for (element in p) {
-            result.add(element * (x.toDouble()).pow(p.indexOf(element)).toInt())
-        }
+    var result = 0
+    for (i in 0 until p.size) {
+        result += p[i] * (x.toDouble().pow(i)).toInt()
     }
-    return result.sum()
+    return result
 }
 
 /**
@@ -200,13 +195,8 @@ fun polynom(p: List<Int>, x: Int): Int {
  * Обратите внимание, что данная функция должна изменять содержание списка list, а не его копии.
  */
 fun accumulate(list: MutableList<Int>): MutableList<Int> {
-    if (list.isNotEmpty()) {
-        var s = 0
-        for (i in 0 until list.size) {
-            val element = list[i]
-            list[i] = element + s
-            s = list[i]
-        }
+    for (i in 1 until list.size) {
+        list[i] += list[i - 1]
     }
     return list
 }
@@ -252,18 +242,12 @@ fun factorizeToString(n: Int): String = factorize(n).joinToString(separator = "*
 fun convert(n: Int, base: Int): List<Int> {
     var number = n
     val result = mutableListOf<Int>()
+    result.add(number % base)
     while (number >= base) {
-        result.add(number % base)
         number /= base
+        result.add(number % base)
     }
-    if (number < base) result.add(number)
-    if (result.size == 1) return result
-    else for (i in 0 until result.size / 2) {
-        val element = result[i]
-        result[i] = result[result.size - 1 - i]
-        result[result.size - 1 - i] = element
-    }
-    return result
+    return result.asReversed()
 }
 
 /**
@@ -279,39 +263,12 @@ fun convert(n: Int, base: Int): List<Int> {
  */
 fun convertToString(n: Int, base: Int): String {
     val result = convert(n, base)
-    val result1 = mutableListOf<String>()
+    var result1 = String()
     for (element in result) {
-        when (element) {
-            10 -> result1.add("a")
-            11 -> result1.add("b")
-            12 -> result1.add("c")
-            13 -> result1.add("d")
-            14 -> result1.add("e")
-            15 -> result1.add("f")
-            16 -> result1.add("g")
-            17 -> result1.add("h")
-            18 -> result1.add("i")
-            19 -> result1.add("j")
-            20 -> result1.add("k")
-            21 -> result1.add("l")
-            22 -> result1.add("m")
-            23 -> result1.add("n")
-            24 -> result1.add("o")
-            25 -> result1.add("p")
-            26 -> result1.add("q")
-            27 -> result1.add("r")
-            28 -> result1.add("s")
-            29 -> result1.add("t")
-            30 -> result1.add("u")
-            31 -> result1.add("v")
-            32 -> result1.add("w")
-            33 -> result1.add("x")
-            34 -> result1.add("y")
-            35 -> result1.add("z")
-            else -> result1.add("$element")
-        }
+        if (element < 10) result1 += element
+        else result1 += ('a' + element - 10)
     }
-    return result1.joinToString("")
+    return result1
 }
 
 
@@ -323,12 +280,15 @@ fun convertToString(n: Int, base: Int): String {
  * Например: digits = (1, 3, 12), base = 14 -> 250
  */
 fun decimal(digits: List<Int>, base: Int): Int {
-    val result = mutableListOf<Int>()
+    var result = 0
+    var pow = base.toDouble().pow(digits.size - 1).toInt()
     if (digits.isNotEmpty()) {
-        for (i in 0 until digits.size)
-            result.add(digits[i] * base.toDouble().pow(digits.size - 1 - i).toInt())
+        for (i in digits.indices) {
+            result += digits[i] * pow
+            pow /= base
+        }
     }
-    return result.sum()
+    return result
 }
 
 /**
@@ -346,35 +306,8 @@ fun decimal(digits: List<Int>, base: Int): Int {
 fun decimalFromString(str: String, base: Int): Int {
     val result = mutableListOf<Int>()
     for (char in str) {
-        when (char) {
-            'a' -> result.add(10)
-            'b' -> result.add(11)
-            'c' -> result.add(12)
-            'd' -> result.add(13)
-            'e' -> result.add(14)
-            'f' -> result.add(15)
-            'g' -> result.add(16)
-            'h' -> result.add(17)
-            'i' -> result.add(18)
-            'j' -> result.add(19)
-            'k' -> result.add(20)
-            'l' -> result.add(21)
-            'm' -> result.add(22)
-            'n' -> result.add(23)
-            'o' -> result.add(24)
-            'p' -> result.add(25)
-            'q' -> result.add(26)
-            'r' -> result.add(27)
-            's' -> result.add(28)
-            't' -> result.add(29)
-            'u' -> result.add(30)
-            'v' -> result.add(31)
-            'w' -> result.add(32)
-            'x' -> result.add(33)
-            'y' -> result.add(34)
-            'z' -> result.add(35)
-            else -> result.add(Character.getNumericValue(char))
-        }
+        if (char >= 'a') result.add(char - 'a' + 10)
+        else result.add(Character.getNumericValue(char))
     }
     val result1 = result.toList()
     return decimal(result1, base)
@@ -389,62 +322,40 @@ fun decimalFromString(str: String, base: Int): Int {
  * Например: 23 = XXIII, 44 = XLIV, 100 = C
  */
 fun roman(n: Int): String {
-    val result = mutableListOf<String>()
+    val result = mutableListOf<Int>()
+    var result1 = String()
     var number = n
-    while (number > 999) {
-        result.add("M")
-        number -= 1000
-    }
-    while (number > 899) {
-        result.add("CM")
-        number -= 900
-    }
-    while (number > 499) {
-        result.add("D")
-        number -= 500
-    }
-    while (number > 399) {
-        result.add("CD")
-        number -= 400
-    }
-    while (number > 99) {
-        result.add("C")
-        number -= 100
-    }
-    while (number > 89) {
-        result.add("XC")
-        number -= 90
-    }
-    while (number > 49) {
-        result.add("L")
-        number -= 50
-    }
-    while (number > 39) {
-        result.add("XL")
-        number -= 40
-    }
-    while (number > 9) {
-        result.add("X")
-        number -= 10
-    }
-    while (number > 8) {
-        result.add("IX")
-        number -= 9
-    }
-    while (number > 4) {
-        result.add("V")
-        number -= 5
-    }
-    while (number > 3) {
-        result.add("IV")
-        number -= 4
-    }
+    var index = 0
+    val variants = listOf('I', 'V', 'X', 'L', 'C', 'D', 'M')
     while (number > 0) {
-        result.add("I")
-        number -= 1
+        result.add(number % 10)
+        number /= 10
     }
-    return result.joinToString("")
+    for (i in 0 until result.size) {
+        when (i) {
+            0 -> index = 1
+            1 -> index = 3
+            2 -> index = 5
+            3 -> index = 6
+        }
+        if (i < 3) {
+            when (result[i] - 5) {
+                -4, 1 -> result1 += variants[index - 1]
+                -3, 2 -> result1 = result1 + variants[index - 1] + variants[index - 1]
+                -2, 3 -> result1 = result1 + variants[index - 1] + variants[index - 1] + variants[index - 1]
+                -1 -> result1 = result1 + variants[index] + variants[index - 1]
+                4 -> result1 = result1 + variants[index + 1] + variants[index - 1]
+            }
+            if (result[i] - 5 > -1 && result[i] - 5 != 4) result1 += variants[index]
+        } else when (result[i] - 1) {
+            0 -> result1 += variants[index]
+            1 -> result1 = result1 + variants[index] + variants[index]
+            2 -> result1 = result1 + variants[index] + variants[index] + variants[index]
+        }
+    }
+    return result1.toList().asReversed().joinToString("")
 }
+
 
 /**
  * Очень сложная (7 баллов)
@@ -454,90 +365,102 @@ fun roman(n: Int): String {
  * 23964 = "двадцать три тысячи девятьсот шестьдесят четыре"
  */
 fun russian(n: Int): String {
-    val result = mutableListOf<String>()
+    val variants1 =
+        listOf("", "один", "дв", "три", "четыр", "пят", "шест", "сем", "восем", "девят")
+    var result1 = String()
+    var result2 = String()
+    var result3 = String()
+    var result4 = String()
+    var result5 = String()
+    var result6 = String()
+    var x = 0
+    var y = 0
     val number = mutableListOf<Int>()
     var number1 = n
     while (number1 > 0) {
         number.add(number1 % 10)
         number1 /= 10
     }
-    while (number.isNotEmpty()) {
-        when (number.size) {
-            1 -> {
-                when (number[number.size - 1]) {
-                    1 -> result.add("один")
-                    2 -> result.add("два")
-                    3 -> result.add("три")
-                    4 -> result.add("четыре")
-                    5 -> result.add("пять")
-                    6 -> result.add("шесть")
-                    7 -> result.add("семь")
-                    8 -> result.add("восемь")
-                    9 -> result.add("девять")
+    for (i in 0 until number.size) {
+        when (i) {
+            0 -> if (number[i + 1] != 1) {
+                when (number[i]) {
+                    2 -> result1 = result1 + variants1[number[i]] + "а"
+                    3 -> result1 += variants1[number[i]]
+                    4 -> result1 = result1 + variants1[number[i]] + "е"
+                    5, 6, 7, 8, 9 -> result1 = result1 + variants1[number[i]] + "ь"
                 }
-                number.removeAt(number.size - 1)
+            }
+            1, 4 -> {
+                if (number[i] == 1) {
+                    when (number[i - 1]) {
+                        0 -> result5 += "десять"
+                        1, 3, 4, 5, 6, 7, 8, 9 -> result5 = result5 + variants1[number[i - 1]] + "надцать"
+                        2 -> result5 = result5 + variants1[number[i - 1]] + "енадцать"
+                    }
+                    if (i == 4) {
+                        result4 = ""
+                        result4 += "тысяч "
+                    }
+                } else {
+                    when (number[i]) {
+                        2 -> result5 = result5 + variants1[number[i]] + "адцать"
+                        3 -> result5 = result5 + variants1[number[i]] + "дцать"
+                        4 -> result5 += "сорок"
+                        5, 6, 7, 8 -> result5 = result5 + variants1[number[i]] + "ьдесят"
+                        9 -> result5 += "девяносто"
+                    }
+                }
+                if (result2.isEmpty()) {
+                    if (x == 0) {
+                        result2 += result5
+                        result5 = ""
+                    }
+                    x += 1
+                }
+                if ((result1.isNotEmpty() || result2.isNotEmpty()
+                            || result3.isNotEmpty() || result4.isNotEmpty()) && result5.isNotEmpty()
+                ) result5 += " "
+                else if (result1.isNotEmpty() && result2.isNotEmpty()) result2 += " "
             }
             2, 5 -> {
-                if (number[number.size - 1] == 1) {
-                    when (number[number.size - 2]) {
-                        0 -> result.add("десять")
-                        1 -> result.add("одиннадцать")
-                        2 -> result.add("двенадцать")
-                        3 -> result.add("тринадцать")
-                        4 -> result.add("четырнадцать")
-                        5 -> result.add("пятнадцать")
-                        6 -> result.add("шестнадцать")
-                        7 -> result.add("семнадцать")
-                        8 -> result.add("восемнадцать")
-                        9 -> result.add("девятнадцать")
+                when (number[i]) {
+                    1 -> result6 += "сто"
+                    2 -> result6 = result6 + variants1[number[i]] + "ести"
+                    3 -> result6 = result6 + variants1[number[i]] + "ста"
+                    4 -> result6 = result6 + variants1[number[i]] + "еста"
+                    5, 6, 7, 8, 9 -> result6 = result6 + variants1[number[i]] + "ьсот"
+                }
+                if (result3.isEmpty()) {
+                    if (y == 0) {
+                        result3 += result6
+                        result6 = ""
                     }
-                    number.removeAt(number.size - 1)
-                    number.removeAt(number.size - 1)
-                    if (number.size == 3) result.add("тысяч")
-                } else {
-                    when (number[number.size - 1]) {
-                        2 -> result.add("двадцать")
-                        3 -> result.add("тридцать")
-                        4 -> result.add("сорок")
-                        5 -> result.add("пятьдесят")
-                        6 -> result.add("шестьдесят")
-                        7 -> result.add("семьдесят")
-                        8 -> result.add("восемьдесят")
-                        9 -> result.add("девяносто")
-                    }
-                    number.removeAt(number.size - 1)
+                    y += 1
                 }
+                if ((result1.isNotEmpty() || result2.isNotEmpty()
+                            || result3.isNotEmpty() || result4.isNotEmpty() || result5.isNotEmpty()) && result6.isNotEmpty()
+                )
+                    result6 += " "
+                else if ((result1.isNotEmpty() || result2.isNotEmpty()) && result3.isNotEmpty()) result3 += " "
             }
-            3, 6 -> {
-                when (number[number.size - 1]) {
-                    1 -> result.add("сто")
-                    2 -> result.add("двести")
-                    3 -> result.add("триста")
-                    4 -> result.add("четыреста")
-                    5 -> result.add("пятьсот")
-                    6 -> result.add("шестьсот")
-                    7 -> result.add("семьсот")
-                    8 -> result.add("восемьсот")
-                    9 -> result.add("девятьсот")
+            3 -> {
+                when (number[i]) {
+                    1 -> result4 += "одна тысяча "
+                    2, 4 -> result4 = result4 + variants1[number[i]] + "е "
+                    5, 6, 7, 8, 9 -> result4 = result4 + variants1[number[i]] + "ь "
                 }
-                number.removeAt(number.size - 1)
-            }
-            4 -> {
-                when (number[number.size - 1]) {
-                    0 -> result.add("тысяч")
-                    1 -> result.add("одна тысяча")
-                    2 -> result.add("две тысячи")
-                    3 -> result.add("три тысячи")
-                    4 -> result.add("четыре тысячи")
-                    5 -> result.add("пять тысяч")
-                    6 -> result.add("шесть тысяч")
-                    7 -> result.add("семь тысяч")
-                    8 -> result.add("восемь тысяч")
-                    9 -> result.add("девять тысяч")
+                when (number[i]) {
+                    2, 3, 4 -> result4 += "тысячи"
+                    0, 5, 6, 7, 8, 9 -> result4 += "тысяч"
                 }
-                number.removeAt(number.size - 1)
+                if (result1.isNotEmpty() || result2.isNotEmpty() || result3.isNotEmpty()) result4 += " "
             }
         }
     }
-    return result.joinToString(" ")
+    return result6 + result5 + result4 + result3 + result2 + result1
 }
+
+
+
+
