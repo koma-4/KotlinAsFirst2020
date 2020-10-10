@@ -419,7 +419,8 @@ fun russian(n: Int): String {
                     x += 1
                 }
                 if ((result1.isNotEmpty() || result2.isNotEmpty()
-                            || result3.isNotEmpty() || result4.isNotEmpty()) && result5.isNotEmpty()
+                            || result3.isNotEmpty() || result4.isNotEmpty())
+                    && result5.isNotEmpty()
                 ) result5 += " "
                 else if (result1.isNotEmpty() && result2.isNotEmpty()) result2 += " "
             }
@@ -439,10 +440,12 @@ fun russian(n: Int): String {
                     y += 1
                 }
                 if ((result1.isNotEmpty() || result2.isNotEmpty()
-                            || result3.isNotEmpty() || result4.isNotEmpty() || result5.isNotEmpty()) && result6.isNotEmpty()
+                            || result3.isNotEmpty() || result4.isNotEmpty()
+                            || result5.isNotEmpty()) && result6.isNotEmpty()
                 )
                     result6 += " "
-                else if ((result1.isNotEmpty() || result2.isNotEmpty()) && result3.isNotEmpty()) result3 += " "
+                else if ((result1.isNotEmpty() || result2.isNotEmpty()) && result3.isNotEmpty())
+                    result3 += " "
             }
             3 -> {
                 when (number[i]) {
@@ -454,7 +457,8 @@ fun russian(n: Int): String {
                     2, 3, 4 -> result4 += "тысячи"
                     0, 5, 6, 7, 8, 9 -> result4 += "тысяч"
                 }
-                if (result1.isNotEmpty() || result2.isNotEmpty() || result3.isNotEmpty()) result4 += " "
+                if (result1.isNotEmpty() || result2.isNotEmpty() || result3.isNotEmpty())
+                    result4 += " "
             }
         }
     }
