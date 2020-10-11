@@ -7,7 +7,6 @@ import kotlin.math.sqrt
 import kotlin.math.pow
 
 
-
 // Урок 4: списки
 // Максимальное количество баллов = 12
 // Рекомендуемое количество баллов = 8
@@ -160,10 +159,8 @@ fun center(list: MutableList<Double>): MutableList<Double> {
  */
 fun times(a: List<Int>, b: List<Int>): Int {
     var result = 0
-    var n = 0
-    for (element in a) {
-        result += element * b[n]
-        n += 1
+    for ((index, element) in a.withIndex()) {
+        result += element * b[index]
     }
     return result
 }
@@ -178,7 +175,7 @@ fun times(a: List<Int>, b: List<Int>): Int {
  */
 fun polynom(p: List<Int>, x: Int): Int {
     var result = 0
-    for (i in 0 until p.size) {
+    for (i in p.indices) {
         result += p[i] * (x.toDouble().pow(i)).toInt()
     }
     return result
@@ -263,10 +260,10 @@ fun convert(n: Int, base: Int): List<Int> {
  */
 fun convertToString(n: Int, base: Int): String {
     val result = convert(n, base)
-    var result1 = String()
+    var result1 = ""
     for (element in result) {
-        if (element < 10) result1 += element
-        else result1 += ('a' + element - 10)
+        result1 += if (element < 10) element
+        else ('a' + element - 10)
     }
     return result1
 }
@@ -282,11 +279,9 @@ fun convertToString(n: Int, base: Int): String {
 fun decimal(digits: List<Int>, base: Int): Int {
     var result = 0
     var pow = base.toDouble().pow(digits.size - 1).toInt()
-    if (digits.isNotEmpty()) {
-        for (i in digits.indices) {
-            result += digits[i] * pow
-            pow /= base
-        }
+    for (i in digits.indices) {
+        result += digits[i] * pow
+        pow /= base
     }
     return result
 }
@@ -309,8 +304,7 @@ fun decimalFromString(str: String, base: Int): Int {
         if (char >= 'a') result.add(char - 'a' + 10)
         else result.add(Character.getNumericValue(char))
     }
-    val result1 = result.toList()
-    return decimal(result1, base)
+    return decimal(result, base)
 }
 
 /**
@@ -322,40 +316,12 @@ fun decimalFromString(str: String, base: Int): Int {
  * Например: 23 = XXIII, 44 = XLIV, 100 = C
  */
 fun roman(n: Int): String {
-    val result = mutableListOf<Int>()
-    var result1 = String()
-    var number = n
-    var index = 0
-    val variants = listOf('I', 'V', 'X', 'L', 'C', 'D', 'M')
-    while (number > 0) {
-        result.add(number % 10)
-        number /= 10
-    }
-    for (i in 0 until result.size) {
-        when (i) {
-            0 -> index = 1
-            1 -> index = 3
-            2 -> index = 5
-            3 -> index = 6
-        }
-        if (i < 3) {
-            when (result[i] - 5) {
-                -4, 1 -> result1 += variants[index - 1]
-                -3, 2 -> result1 = result1 + variants[index - 1] + variants[index - 1]
-                -2, 3 -> result1 = result1 + variants[index - 1] + variants[index - 1] + variants[index - 1]
-                -1 -> result1 = result1 + variants[index] + variants[index - 1]
-                4 -> result1 = result1 + variants[index + 1] + variants[index - 1]
-            }
-            if (result[i] - 5 > -1 && result[i] - 5 != 4) result1 += variants[index]
-        } else when (result[i] - 1) {
-            0 -> result1 += variants[index]
-            1 -> result1 = result1 + variants[index] + variants[index]
-            2 -> result1 = result1 + variants[index] + variants[index] + variants[index]
-        }
-    }
-    return result1.toList().asReversed().joinToString("")
+    val thousands = listOf("", "M", "MM", "MMM")
+    val hundreds = listOf("", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM")
+    val tens = listOf("", "X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC")
+    val ones = listOf("", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX")
+    return thousands[n / 1000] + hundreds[n / 100 % 10] + tens[n / 10 % 10] + ones[n % 10]
 }
-
 
 /**
  * Очень сложная (7 баллов))
@@ -365,105 +331,70 @@ fun roman(n: Int): String {
  * 23964 = "двадцать три тысячи девятьсот шестьдесят четыре"
  */
 fun russian(n: Int): String {
-    val variants1 =
-        listOf("", "один", "дв", "три", "четыр", "пят", "шест", "сем", "восем", "девят")
-    var result1 = String()
-    var result2 = String()
-    var result3 = String()
-    var result4 = String()
-    var result5 = String()
-    var result6 = String()
-    var x = 0
-    var y = 0
-    val number = mutableListOf<Int>()
-    var number1 = n
-    while (number1 > 0) {
-        number.add(number1 % 10)
-        number1 /= 10
+    val digit1and4 =
+        listOf("", "сто", "двести", "триста", "четыреста", "пятьсот", "шестьсот", "семьсот", "восемьсот", "девятьсот")
+    val exception=
+        listOf(
+            "десять",
+            "одиннадцать",
+            "двенадцать",
+            "тринадцать",
+            "четырнадцать",
+            "пятнадцать",
+            "шестнадцать",
+            "семнадцать",
+            "восемнадцать",
+            "девятнадцать"
+        )
+    val digit2and5 =
+        listOf(
+            "",
+            "",
+            "двадцать",
+            "тридцать",
+            "сорок",
+            "пятьдесят",
+            "шестьдесят",
+            "семьдесят",
+            "восемьдесят",
+            "девяносто"
+        )
+    val digit3 =
+        listOf("", "одна", "две", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять")
+    val Digit6 = listOf("", "один", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять")
+    var digit1 = digit1and4[n / 100000]
+    if (digit1.isNotEmpty()) digit1 += " "
+    var check1 = digit2and5[n / 10000 % 10]
+    if (check1.isNotEmpty()) check1 += " "
+    var check2 = digit3[n / 1000 % 10]
+    if (check2.isNotEmpty()) check2 += " "
+    var digit4 = digit1and4[n / 100 % 10]
+    var digit5 = digit2and5[n / 10 % 10]
+    var digit6 = Digit6[n % 10]
+    if (digit6.isNotEmpty() && digit5.isNotEmpty()) digit5 += " "
+    if (digit4.isNotEmpty() && (digit5.isNotEmpty() || digit6.isNotEmpty())) digit4 += " "
+    if (n / 1000 % 100 in 10..19) {
+        check1 = exception[n / 1000 % 10]
+        check2 = ""
+        if (digit4.isNotEmpty()) check1 += " "
     }
-    for (i in 0 until number.size) {
-        when (i) {
-            0 -> if (number[i + 1] != 1) {
-                when (number[i]) {
-                    2 -> result1 = result1 + variants1[number[i]] + "а"
-                    3 -> result1 += variants1[number[i]]
-                    4 -> result1 = result1 + variants1[number[i]] + "е"
-                    5, 6, 7, 8, 9 -> result1 = result1 + variants1[number[i]] + "ь"
-                }
-            }
-            1, 4 -> {
-                if (number[i] == 1) {
-                    when (number[i - 1]) {
-                        0 -> result5 += "десять"
-                        1, 3, 4, 5, 6, 7, 8, 9 -> result5 = result5 + variants1[number[i - 1]] + "надцать"
-                        2 -> result5 = result5 + variants1[number[i - 1]] + "енадцать"
-                    }
-                    if (i == 4) {
-                        result4 = ""
-                        result4 += "тысяч "
-                    }
-                } else {
-                    when (number[i]) {
-                        2 -> result5 = result5 + variants1[number[i]] + "адцать"
-                        3 -> result5 = result5 + variants1[number[i]] + "дцать"
-                        4 -> result5 += "сорок"
-                        5, 6, 7, 8 -> result5 = result5 + variants1[number[i]] + "ьдесят"
-                        9 -> result5 += "девяносто"
-                    }
-                }
-                if (result2.isEmpty()) {
-                    if (x == 0) {
-                        result2 += result5
-                        result5 = ""
-                    }
-                    x += 1
-                }
-                if ((result1.isNotEmpty() || result2.isNotEmpty()
-                            || result3.isNotEmpty() || result4.isNotEmpty())
-                    && result5.isNotEmpty()
-                ) result5 += " "
-                else if (result1.isNotEmpty() && result2.isNotEmpty()) result2 += " "
-            }
-            2, 5 -> {
-                when (number[i]) {
-                    1 -> result6 += "сто"
-                    2 -> result6 = result6 + variants1[number[i]] + "ести"
-                    3 -> result6 = result6 + variants1[number[i]] + "ста"
-                    4 -> result6 = result6 + variants1[number[i]] + "еста"
-                    5, 6, 7, 8, 9 -> result6 = result6 + variants1[number[i]] + "ьсот"
-                }
-                if (result3.isEmpty()) {
-                    if (y == 0) {
-                        result3 += result6
-                        result6 = ""
-                    }
-                    y += 1
-                }
-                if ((result1.isNotEmpty() || result2.isNotEmpty()
-                            || result3.isNotEmpty() || result4.isNotEmpty()
-                            || result5.isNotEmpty()) && result6.isNotEmpty()
-                )
-                    result6 += " "
-                else if ((result1.isNotEmpty() || result2.isNotEmpty()) && result3.isNotEmpty())
-                    result3 += " "
-            }
-            3 -> {
-                when (number[i]) {
-                    1 -> result4 += "одна тысяча "
-                    2, 4 -> result4 = result4 + variants1[number[i]] + "е "
-                    5, 6, 7, 8, 9 -> result4 = result4 + variants1[number[i]] + "ь "
-                }
-                when (number[i]) {
-                    2, 3, 4 -> result4 += "тысячи"
-                    0, 5, 6, 7, 8, 9 -> result4 += "тысяч"
-                }
-                if (result1.isNotEmpty() || result2.isNotEmpty() || result3.isNotEmpty())
-                    result4 += " "
-            }
+    if (digit1.isNotEmpty() && check1.isEmpty() && check2.isEmpty()) digit1 += "тысяч "
+    if (check2.isEmpty() && check1.isNotEmpty()) check1 += "тысяч "
+    if (check2.isNotEmpty()) {
+        when (check2) {
+            "одна " -> check2 += "тысяча"
+            "две ", "три ", "четыре " -> check2 += "тысячи"
+            "пять ", "шесть ", "семь ", "восемь ", "девять " -> check2 += "тысяч"
         }
+        if (digit4.isNotEmpty() || digit5.isNotEmpty() || digit6.isNotEmpty()) check2 += " "
     }
-    return result6 + result5 + result4 + result3 + result2 + result1
+    if (n % 100 in 10..19) {
+        digit5 = exception[n % 10]
+        digit6 = ""
+    }
+    return digit1 + check1 + check2 + digit4 + digit5 + digit6
 }
+
 
 
 
