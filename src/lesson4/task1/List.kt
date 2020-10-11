@@ -378,8 +378,12 @@ fun russian(n: Int): String {
         check2 = ""
         if (digit4.isNotEmpty()) check1 += " "
     }
-    if (digit1.isNotEmpty() && check1.isEmpty() && check2.isEmpty()) digit1 += "тысяч "
-    if (check2.isEmpty() && check1.isNotEmpty()) check1 += "тысяч "
+    if (digit1.isNotEmpty() && check1.isEmpty() && check2.isEmpty()) digit1 += "тысяч"
+    if (digit1.isNotEmpty() && check1.isEmpty() && check2.isEmpty() &&
+        (digit4.isNotEmpty() || digit5.isNotEmpty() || digit6.isNotEmpty())) digit1 += " "
+    if (check2.isEmpty() && check1.isNotEmpty()) check1 += "тысяч"
+    if (check1.isNotEmpty() && check2.isEmpty() &&
+        (digit4.isNotEmpty() || digit5.isNotEmpty() || digit6.isNotEmpty())) check1 += " "
     if (check2.isNotEmpty()) {
         when (check2) {
             "одна " -> check2 += "тысяча"
