@@ -376,7 +376,7 @@ fun russian(n: Int): String {
     if (n / 1000 % 100 in 10..19) {
         check1 = exception[n / 1000 % 10]
         check2 = ""
-        if (digit4.isNotEmpty()) check1 += " "
+        if (digit4.isNotEmpty() || digit5.isNotEmpty()) check1 += " "
     }
     if (digit1.isNotEmpty() && check1.isEmpty() && check2.isEmpty()) digit1 += "тысяч"
     if (digit1.isNotEmpty() && check1.isEmpty() && check2.isEmpty() &&
