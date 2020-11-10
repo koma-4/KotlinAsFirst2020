@@ -2,6 +2,7 @@
 
 package lesson4.task1
 
+import kotlinx.html.attributes.stringSetDecode
 import lesson1.task1.discriminant
 import kotlin.math.sqrt
 import kotlin.math.pow
@@ -371,13 +372,17 @@ fun russian(n: Int): String {
     var digit4 = digit1and4[n / 100 % 10]
     var digit5 = digit2and5[n / 10 % 10]
     var digit6 = Digit6[n % 10]
+    if (n / 1000 % 100 in 10..19) {
+        check1 = exception[n / 1000 % 10] + " "
+        check2 = ""
+    }
+
+    if (n % 100 in 10..19) {
+        digit5 = exception[n % 10]
+        digit6 = ""
+    }
     if (digit6.isNotEmpty() && digit5.isNotEmpty()) digit5 += " "
     if (digit4.isNotEmpty() && (digit5.isNotEmpty() || digit6.isNotEmpty())) digit4 += " "
-    if (n / 1000 % 100 in 10..19) {
-        check1 = exception[n / 1000 % 10]
-        check2 = ""
-        if (digit4.isNotEmpty() || digit5.isNotEmpty()) check1 += " "
-    }
     if (digit1.isNotEmpty() && check1.isEmpty() && check2.isEmpty()) digit1 += "тысяч"
     if (digit1.isNotEmpty() && check1.isEmpty() && check2.isEmpty() &&
         (digit4.isNotEmpty() || digit5.isNotEmpty() || digit6.isNotEmpty())) digit1 += " "
@@ -391,10 +396,6 @@ fun russian(n: Int): String {
             "пять ", "шесть ", "семь ", "восемь ", "девять " -> check2 += "тысяч"
         }
         if (digit4.isNotEmpty() || digit5.isNotEmpty() || digit6.isNotEmpty()) check2 += " "
-    }
-    if (n % 100 in 10..19) {
-        digit5 = exception[n % 10]
-        digit6 = ""
     }
     return digit1 + check1 + check2 + digit4 + digit5 + digit6
 }

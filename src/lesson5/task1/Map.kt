@@ -101,8 +101,9 @@ fun buildWordSet(text: List<String>): MutableSet<String> {
 fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> {
     val res = mutableMapOf<Int, MutableList<String>>()
     for ((name, grade) in grades) {
-        if (!res.containsKey(grade)) res[grade] = mutableListOf(name)
-        else res[grade]?.add(name)
+        val tmp = res[grade]
+        if (tmp.isNullOrEmpty()) res[grade] = mutableListOf(name)
+        else tmp.add(name)
     }
     return res
 }
@@ -196,11 +197,9 @@ fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<S
  */
 fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Double> {
     val k = mutableMapOf<String, Int>()
-    val n = mutableSetOf<String>()
     val newMap = mutableMapOf<String, Double>()
     for ((org, price) in stockPrices) {
         if (!newMap.containsKey(org)) {
-            n.add(org)
             newMap[org] = price
             k[org] = 1
         } else {
@@ -296,15 +295,14 @@ fun extractRepeats(list: List<String>): Map<String, Int> {
  *   hasAnagrams(listOf("тор", "свет", "рот")) -> true
  */
 fun hasAnagrams(words: List<String>): Boolean {
-    var res = mutableMapOf<Char, Int>()
-    val res1 = mutableMapOf<Set<Char>, Map<Char, Int>>()
+    val variants = mutableSetOf<Map<Char, Int>>()
     for (element in words) {
+        val res = mutableMapOf<Char, Int>()
         for (char in element) {
             res[char] = (res[char] ?: 0) + 1
         }
-        if (res1[element.toSet()] == res) return true
-        res1[element.toSet()] = res
-        res = mutableMapOf()
+        if (variants.contains(res)) return true
+        variants.add(res)
     }
     return false
 }
@@ -407,10 +405,10 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
     var pair = Pair(-1, -1)
     val map = mutableMapOf<Int, Int>()
     for (i in list.indices) {
-        map[list[i]] = i
-        if (map.containsKey(number - list[i]) && i != map[number - list[i]])
-            pair = Pair(map.getValue(number - list[i]), i)
-        print(pair)
+        val tmp = map[number - list[i]]
+        if (i != tmp) map[list[i]] = i
+        if (tmp != null)
+            pair = Pair(tmp, i)
     }
     return pair
 }
