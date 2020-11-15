@@ -302,7 +302,6 @@ fun hasAnagrams(words: List<String>): Boolean {
             res[char] = (res[char] ?: 0) + 1
         }
         if (!variants.add(res)) return true
-        else variants.add(res)
     }
     return false
 }
@@ -368,7 +367,10 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
                         for (each in friends[one] ?: error("")) {
                             k.add(one)
                             if (each !in mates) {
-                                if (each != name) k.add(each)
+                                if (each != name) {
+                                    k.add(each)
+                                    if (friends.contains(each)) k.addAll(friends[each]!!)
+                                }
                             }
                         }
                     }
@@ -402,15 +404,14 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
  *   findSumOfTwo(listOf(1, 2, 3), 6) -> Pair(-1, -1)
  */
 fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
-    val pair = Pair(-1, -1)
     val map = mutableMapOf<Int, Int>()
     for (i in list.indices) {
         val tmp = map[number - list[i]]
-        map[list[i]] = i
         if (tmp != null)
             return (Pair(tmp, i))
+        map[list[i]] = i
     }
-    return pair
+    return Pair(-1, -1)
 }
 
 /**

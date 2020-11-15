@@ -132,7 +132,7 @@ fun bestLongJump(jumps: String): Int = TODO()
  * вернуть -1.
  */
 fun bestHighJump(jumps: String): Int {
-    return if (Regex("""(\d+\s[+\-%]*\s*)*""").find(jumps) != null)
+    return if (Regex("""(\d+(\s[+\-%]+)+\s*)+""").matchEntire(jumps) != null)
         Regex("""\d+\s[%-]*\+""").findAll(jumps)
             .maxOfOrNull { result -> result.value.filter { it.isDigit() }.toInt() } ?: -1
     else -1
@@ -148,14 +148,13 @@ fun bestHighJump(jumps: String): Int {
  * Про нарушении формата входной строки бросить исключение IllegalArgumentException
  */
 fun plusMinus(expression: String): Int {
-    if (expression.matches(Regex("""\d+(\s[+\-]\s\d+)*"""))) {
-        val plus = Regex(""" (\+\s\d+)|^\d+""").findAll(expression)
+    if (!expression.matches(Regex("""\d+(\s[+\-]\s\d+)*"""))) throw IllegalArgumentException()
+    val plus = Regex(""" (\+\s\d+)|^\d+""").findAll(expression)
+        .sumOf { result -> result.value.filter { it.isDigit() }.toInt() }
+    val minus =
+        Regex(""" (-\s\d+)""").findAll(expression)
             .sumOf { result -> result.value.filter { it.isDigit() }.toInt() }
-        val minus =
-            Regex(""" (-\s\d+)""").findAll(expression)
-                .sumOf { result -> result.value.filter { it.isDigit() }.toInt() }
-        return plus - minus
-    } else throw IllegalArgumentException()
+    return plus - minus
 }
 
 /**
