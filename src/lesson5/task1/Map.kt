@@ -341,54 +341,7 @@ fun hasAnagrams(words: List<String>): Boolean {
  *          "GoodGnome" to setOf()
  *        )
  */
-fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<String>> {
-    val res = mutableMapOf<String, Set<String>>()
-    var k = mutableSetOf<String>()
-    val n = mutableSetOf<String>()
-    var newMates = mutableSetOf<String>()
-    for ((name, mates) in friends) {
-        if (mates.isNotEmpty()) {
-            for (one in mates) {
-                if (n.contains(one)) {
-                    k.add(one)
-                    if (res[one]!!.isNotEmpty()) {
-                        k.addAll(res[one]!!)
-                        k.remove(name)
-                    }
-                } else {
-                    if (friends[one].isNullOrEmpty()) {
-                        n.add(one)
-                        res[one] = newMates
-                        if (mates.size == 1) {
-                            k = mates.toMutableSet()
-                            n.add(name)
-                        } else k.add(one)
-                    } else {
-                        for (each in friends[one] ?: error("")) {
-                            k.add(one)
-                            if (each !in mates) {
-                                if (each != name) {
-                                    k.add(each)
-                                    if (friends.contains(each)) {
-                                        for (element in friends[each]!!) {
-                                            if (element != name) k.add(element)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        newMates = k
-        k = mutableSetOf()
-        n.add(name)
-        res[name] = newMates
-        newMates = mutableSetOf()
-    }
-    return res
-}
+fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<String>> = TODO()
 
 /**
  * Сложная (6 баллов)
