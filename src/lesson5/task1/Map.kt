@@ -369,7 +369,11 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
                             if (each !in mates) {
                                 if (each != name) {
                                     k.add(each)
-                                    if (friends.contains(each)) k.addAll(friends[each]!!)
+                                    if (friends.contains(each)) {
+                                        for (element in friends[each]!!) {
+                                            if (element != name) k.add(element)
+                                        }
+                                    }
                                 }
                             }
                         }
