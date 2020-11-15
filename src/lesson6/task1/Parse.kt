@@ -2,6 +2,9 @@
 
 package lesson6.task1
 
+import java.lang.IllegalArgumentException
+
+
 // Урок 6: разбор строк, исключения
 // Максимальное количество баллов = 13
 // Рекомендуемое количество баллов = 11
@@ -76,6 +79,7 @@ fun main() {
  */
 fun dateStrToDigit(str: String): String = TODO()
 
+
 /**
  * Средняя (4 балла)
  *
@@ -127,7 +131,12 @@ fun bestLongJump(jumps: String): Int = TODO()
  * При нарушении формата входной строки, а также в случае отсутствия удачных попыток,
  * вернуть -1.
  */
-fun bestHighJump(jumps: String): Int = TODO()
+fun bestHighJump(jumps: String): Int {
+    return if (Regex("""(\d+\s[+\-%]*\s*)*""").find(jumps) != null)
+        Regex("""\d+\s[%-]*\+""").findAll(jumps)
+            .maxOfOrNull { result -> result.value.filter { it.isDigit() }.toInt() } ?: -1
+    else -1
+}
 
 /**
  * Сложная (6 баллов)
@@ -138,7 +147,16 @@ fun bestHighJump(jumps: String): Int = TODO()
  * Вернуть значение выражения (6 для примера).
  * Про нарушении формата входной строки бросить исключение IllegalArgumentException
  */
-fun plusMinus(expression: String): Int = TODO()
+fun plusMinus(expression: String): Int {
+    if (expression.matches(Regex("""\d+(\s[+\-]\s\d+)*"""))) {
+        val plus = Regex(""" (\+\s\d+)|^\d+""").findAll(expression)
+            .sumOf { result -> result.value.filter { it.isDigit() }.toInt() }
+        val minus =
+            Regex(""" (-\s\d+)""").findAll(expression)
+                .sumOf { result -> result.value.filter { it.isDigit() }.toInt() }
+        return plus - minus
+    } else throw IllegalArgumentException()
+}
 
 /**
  * Сложная (6 баллов)
