@@ -132,10 +132,10 @@ fun bestLongJump(jumps: String): Int = TODO()
  * вернуть -1.
  */
 fun bestHighJump(jumps: String): Int {
-    return if (Regex("""(\d+(\s[+\-%]+)+\s*)+""").matchEntire(jumps) != null)
-        Regex("""\d+\s[%-]*\+""").findAll(jumps)
-            .maxOfOrNull { result -> result.value.filter { it.isDigit() }.toInt() } ?: -1
-    else -1
+    return if (jumps.matches(Regex("""(\d+\s[+\-%]+\s)+(\d+\s[+\-%]+)$|^(\d+\s[+\-%])$"""))) {
+        return Regex("""(\d+)\s[%-]*\+""").findAll(jumps)
+            .map { it.groupValues[1].toInt() }.maxOfOrNull { it } ?: -1
+    } else -1
 }
 
 /**
@@ -149,12 +149,10 @@ fun bestHighJump(jumps: String): Int {
  */
 fun plusMinus(expression: String): Int {
     if (!expression.matches(Regex("""\d+(\s[+\-]\s\d+)*"""))) throw IllegalArgumentException()
-    val plus = Regex(""" (\+\s\d+)|^\d+""").findAll(expression)
-        .sumOf { result -> result.value.filter { it.isDigit() }.toInt() }
-    val minus =
-        Regex(""" (-\s\d+)""").findAll(expression)
-            .sumOf { result -> result.value.filter { it.isDigit() }.toInt() }
-    return plus - minus
+    val plus = Regex(""" \+\s(\d+)""").findAll(expression).map { it.groupValues[1].toInt() }.sumOf { it }
+    val plus1 = Regex("""^(\d+)""").findAll(expression).map { it.groupValues[1].toInt() }.sumOf { it }
+    val minus = Regex(""" -\s(\d+)""").findAll(expression).map { it.groupValues[1].toInt() }.sumOf { it }
+    return plus + plus1 - minus
 }
 
 /**
