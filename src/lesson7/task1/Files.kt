@@ -92,7 +92,7 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
     for (line in File(inputName).readLines()) {
         for ((key, value) in res) {
             if (Regex(key.toLowerCase()).containsMatchIn(line.toLowerCase()))
-                if (key.toSet().size == 1)
+                if (key.toLowerCase().toSet().size == 1)
                     res[key] = value + (line.length - line.toLowerCase()
                         .replace(key.toLowerCase(), "").length) / key.toSet().size
                 else res[key] = value + (line.length - line.toLowerCase()
@@ -331,14 +331,14 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
                     val replacement = Regex("""\*\*\*([^*]+)\*\*\*""").find(newLine)?.groupValues?.get(1)
                     newLine = Regex("""\*\*\*[^*]+\*\*\*""").replaceFirst(
                         newLine,
-                        "<b><i>$replacement</b></i>"
+                        "<b><i>\\$replacement</b></i>"
                     )
                 }
                 while (newLine.contains(Regex("""\*\*[^*{2}]+\*\*"""))) {
                     val replacement = Regex("""\*\*([^*{2}]+)\*\*""").find(newLine)?.groupValues?.get(1)
                     newLine = Regex("""\*\*[^*{2}]+\*\*""").replaceFirst(
                         newLine,
-                        "<b>$replacement</b>"
+                        "<b>\\$replacement</b>"
                     )
                 }
                 while (newLine.contains(Regex("""\*[^*]+\*"""))) {
@@ -346,12 +346,12 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
                     newLine =
                         Regex("""\*[^*]+\*""").replaceFirst(
                             newLine,
-                            "<i>$replacement</i>"
+                            "<i>\\$replacement</i>"
                         )
                 }
                 while (newLine.contains(Regex("""~~[^~]+~~"""))) {
                     val replacement = Regex("""~~([^~]+)~~""").find(newLine)?.groupValues?.get(1)
-                    newLine = Regex("""~~[^~]+~~""").replaceFirst(newLine, "<s>$replacement</s>")
+                    newLine = Regex("""~~[^~]+~~""").replaceFirst(newLine, "<s>\\$replacement</s>")
                 }
                 it.write(newLine)
             }
@@ -602,7 +602,7 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
         if (k > 0) {
             k -= 1
             writer.newLine()
-            if (minus / 10 >= (newDigit / 10)) deli2 -= 1
+            if (minus.toString().length == newDigit.toString().length) deli2 -= 1
             for (i in 1..deli2) {
                 writer.write(" ")
             }
