@@ -92,8 +92,11 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
     for (line in File(inputName).readLines()) {
         for ((key, value) in res) {
             if (Regex(key.toLowerCase()).containsMatchIn(line.toLowerCase()))
-                res[key] = value + (line.length - line.toLowerCase().replace(key.toLowerCase(), "").length) /
-                        key.toSet().size
+                if (key.toSet().size == 1)
+                    res[key] = value + (line.length - line.toLowerCase()
+                        .replace(key.toLowerCase(), "").length) / key.toSet().size
+                else res[key] = value + (line.length - line.toLowerCase()
+                    .replace(key.toLowerCase(), "").length) / key.toList().size
         }
     }
     return res
@@ -325,21 +328,21 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
                 it.newLine()
                 var newLine = line
                 while (newLine.contains(Regex("""\*\*\*[^*]+\*\*\*"""))) {
-                    val replacement = Regex("""\*\*\*([^*]+)\*\*\*""").find(newLine)!!.groupValues[1]
+                    val replacement = Regex("""\*\*\*([^*]+)\*\*\*""").find(newLine)?.groupValues?.get(1)
                     newLine = Regex("""\*\*\*[^*]+\*\*\*""").replaceFirst(
                         newLine,
                         "<b><i>$replacement</b></i>"
                     )
                 }
                 while (newLine.contains(Regex("""\*\*[^*{2}]+\*\*"""))) {
-                    val replacement = Regex("""\*\*([^*{2}]+)\*\*""").find(newLine)!!.groupValues[1]
+                    val replacement = Regex("""\*\*([^*{2}]+)\*\*""").find(newLine)?.groupValues?.get(1)
                     newLine = Regex("""\*\*[^*{2}]+\*\*""").replaceFirst(
                         newLine,
                         "<b>$replacement</b>"
                     )
                 }
                 while (newLine.contains(Regex("""\*[^*]+\*"""))) {
-                    val replacement = Regex("""\*([^*]+)\*""").find(newLine)!!.groupValues[1]
+                    val replacement = Regex("""\*([^*]+)\*""").find(newLine)?.groupValues?.get(1)
                     newLine =
                         Regex("""\*[^*]+\*""").replaceFirst(
                             newLine,
@@ -347,7 +350,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
                         )
                 }
                 while (newLine.contains(Regex("""~~[^~]+~~"""))) {
-                    val replacement = Regex("""~~([^~]+)~~""").find(newLine)!!.groupValues[1]
+                    val replacement = Regex("""~~([^~]+)~~""").find(newLine)?.groupValues?.get(1)
                     newLine = Regex("""~~[^~]+~~""").replaceFirst(newLine, "<s>$replacement</s>")
                 }
                 it.write(newLine)
@@ -537,14 +540,21 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     var k = 0
     if (lhv.toString().length < rhv.toString().length) minus1 = lhv
     else {
-        if (rhv > lhv / 10.0.pow(exp)) {
-            minus = (lhv / 10.0.pow(exp - 1) / rhv).toInt() * rhv
-            minus1 = (lhv / 10.0.pow(exp - 1) - minus).toInt()
-            k = exp - 1
-        } else {
-            minus = (lhv / 10.0.pow(exp) / rhv * rhv).toInt()
-            minus1 = (lhv / 10.0.pow(exp) - minus).toInt()
-            k = exp
+        when {
+            rhv > lhv -> {
+                minus = 0
+                minus1 = lhv
+            }
+            rhv > lhv / 10.0.pow(exp) -> {
+                minus = (lhv / 10.0.pow(exp - 1) / rhv).toInt() * rhv
+                minus1 = (lhv / 10.0.pow(exp - 1) - minus).toInt()
+                k = exp - 1
+            }
+            else -> {
+                minus = (lhv / 10.0.pow(exp) / rhv * rhv).toInt()
+                minus1 = (lhv / 10.0.pow(exp) - minus).toInt()
+                k = exp
+            }
         }
     }
     writer.newLine()
