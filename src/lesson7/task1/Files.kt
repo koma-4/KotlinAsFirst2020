@@ -551,7 +551,7 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
                 k = exp - 1
             }
             else -> {
-                minus = (lhv / 10.0.pow(exp) / rhv * rhv).toInt()
+                minus = (lhv / 10.0.pow(exp) / rhv).toInt() * rhv
                 minus1 = (lhv / 10.0.pow(exp) - minus).toInt()
                 k = exp
             }
