@@ -3,6 +3,7 @@
 package lesson7.task1
 
 import java.io.File
+import kotlin.math.pow
 
 // Урок 7: работа с файлами
 // Урок интегральный, поэтому его задачи имеют сильно увеличенную стоимость
@@ -63,8 +64,16 @@ fun alignFile(inputName: String, lineLength: Int, outputName: String) {
  * Подчёркивание в середине и/или в конце строк значения не имеет.
  */
 fun deleteMarked(inputName: String, outputName: String) {
-    TODO()
+    File(outputName).bufferedWriter().use {
+        for (line in File(inputName).readLines()) {
+            if (!line.startsWith("_")) {
+                it.write(line)
+                it.newLine()
+            }
+        }
+    }
 }
+
 
 /**
  * Средняя (14 баллов)
@@ -75,7 +84,20 @@ fun deleteMarked(inputName: String, outputName: String) {
  * Регистр букв игнорировать, то есть буквы е и Е считать одинаковыми.
  *
  */
-fun countSubstrings(inputName: String, substrings: List<String>): Map<String, Int> = TODO()
+fun countSubstrings(inputName: String, substrings: List<String>): Map<String, Int> {
+    val res = mutableMapOf<String, Int>()
+    for (each in substrings) {
+        res[each] = 0
+    }
+    for (line in File(inputName).readLines()) {
+        for ((key, value) in res) {
+            if (Regex(key.toLowerCase()).containsMatchIn(line.toLowerCase()))
+                res[key] = value + (line.length - line.toLowerCase().replace(key.toLowerCase(), "").length) /
+                        key.toSet().size
+        }
+    }
+    return res
+}
 
 
 /**
@@ -268,21 +290,76 @@ Suspendisse ~~et elit in enim tempus iaculis~~.
  *
  * Соответствующий выходной файл:
 <html>
-    <body>
-        <p>
-            Lorem ipsum <i>dolor sit amet</i>, consectetur <b>adipiscing</b> elit.
-            Vestibulum lobortis. <s>Est vehicula rutrum <i>suscipit</i></s>, ipsum <s>lib</s>ero <i>placerat <b>tortor</b></i>.
-        </p>
-        <p>
-            Suspendisse <s>et elit in enim tempus iaculis</s>.
-        </p>
-    </body>
+<body>
+<p>
+Lorem ipsum <i>dolor sit amet</i>, consectetur <b>adipiscing</b> elit.
+Vestibulum lobortis. <s>Est vehicula rutrum <i>suscipit</i></s>, ipsum <s>lib</s>ero <i>placerat <b>tortor</b></i>.
+</p>
+<p>
+Suspendisse <s>et elit in enim tempus iaculis</s>.
+</p>
+</body>
 </html>
  *
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
-    TODO()
+    var k1 = 0
+    var k2 = 0
+    File(outputName).bufferedWriter().use {
+        it.write("<html>")
+        it.newLine()
+        it.write("<body>")
+        it.newLine()
+        for (line in File(inputName).readLines()) {
+            if (line.isEmpty()) {
+                it.newLine()
+                it.write("</p>")
+                k1++
+            } else {
+                if (k1 == k2) {
+                    it.newLine()
+                    it.write("<p>")
+                    k2++
+                }
+                it.newLine()
+                var newLine = line
+                while (newLine.contains(Regex("""\*\*\*[^*]+\*\*\*"""))) {
+                    val replacement = Regex("""\*\*\*([^*]+)\*\*\*""").find(newLine)!!.groupValues[1]
+                    newLine = Regex("""\*\*\*[^*]+\*\*\*""").replaceFirst(
+                        newLine,
+                        "<b><i>$replacement</b></i>"
+                    )
+                }
+                while (newLine.contains(Regex("""\*\*[^*{2}]+\*\*"""))) {
+                    val replacement = Regex("""\*\*([^*{2}]+)\*\*""").find(newLine)!!.groupValues[1]
+                    newLine = Regex("""\*\*[^*{2}]+\*\*""").replaceFirst(
+                        newLine,
+                        "<b>$replacement</b>"
+                    )
+                }
+                while (newLine.contains(Regex("""\*[^*]+\*"""))) {
+                    val replacement = Regex("""\*([^*]+)\*""").find(newLine)!!.groupValues[1]
+                    newLine =
+                        Regex("""\*[^*]+\*""").replaceFirst(
+                            newLine,
+                            "<i>$replacement</i>"
+                        )
+                }
+                while (newLine.contains(Regex("""~~[^~]+~~"""))) {
+                    val replacement = Regex("""~~([^~]+)~~""").find(newLine)!!.groupValues[1]
+                    newLine = Regex("""~~[^~]+~~""").replaceFirst(newLine, "<s>$replacement</s>")
+                }
+                it.write(newLine)
+            }
+        }
+        it.newLine()
+        it.write("</p>")
+        it.newLine()
+        it.write("</body>")
+        it.newLine()
+        it.write("</html>")
+    }
 }
 
 /**
@@ -319,65 +396,65 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
  *
  * Пример входного файла:
 ///////////////////////////////начало файла/////////////////////////////////////////////////////////////////////////////
-* Утка по-пекински
-    * Утка
-    * Соус
-* Салат Оливье
-    1. Мясо
-        * Или колбаса
-    2. Майонез
-    3. Картофель
-    4. Что-то там ещё
-* Помидоры
-* Фрукты
-    1. Бананы
-    23. Яблоки
-        1. Красные
-        2. Зелёные
+ * Утка по-пекински
+ * Утка
+ * Соус
+ * Салат Оливье
+1. Мясо
+ * Или колбаса
+2. Майонез
+3. Картофель
+4. Что-то там ещё
+ * Помидоры
+ * Фрукты
+1. Бананы
+23. Яблоки
+1. Красные
+2. Зелёные
 ///////////////////////////////конец файла//////////////////////////////////////////////////////////////////////////////
  *
  *
  * Соответствующий выходной файл:
 ///////////////////////////////начало файла/////////////////////////////////////////////////////////////////////////////
 <html>
-  <body>
-    <p>
-      <ul>
-        <li>
-          Утка по-пекински
-          <ul>
-            <li>Утка</li>
-            <li>Соус</li>
-          </ul>
-        </li>
-        <li>
-          Салат Оливье
-          <ol>
-            <li>Мясо
-              <ul>
-                <li>Или колбаса</li>
-              </ul>
-            </li>
-            <li>Майонез</li>
-            <li>Картофель</li>
-            <li>Что-то там ещё</li>
-          </ol>
-        </li>
-        <li>Помидоры</li>
-        <li>Фрукты
-          <ol>
-            <li>Бананы</li>
-            <li>Яблоки
-              <ol>
-                <li>Красные</li>
-                <li>Зелёные</li>
-              </ol>
-            </li>
-          </ol>
-        </li>
-      </ul>
-    </p>
-  </body>
+<body>
+<p>
+<ul>
+<li>
+Утка по-пекински
+<ul>
+<li>Утка</li>
+<li>Соус</li>
+</ul>
+</li>
+<li>
+Салат Оливье
+<ol>
+<li>Мясо
+<ul>
+<li>Или колбаса</li>
+</ul>
+</li>
+<li>Майонез</li>
+<li>Картофель</li>
+<li>Что-то там ещё</li>
+</ol>
+</li>
+<li>Помидоры</li>
+<li>Фрукты
+<ol>
+<li>Бананы</li>
+<li>Яблоки
+<ol>
+<li>Красные</li>
+<li>Зелёные</li>
+</ol>
+</li>
+</ol>
+</li>
+</ul>
+</p>
+</body>
 </html>
 ///////////////////////////////конец файла//////////////////////////////////////////////////////////////////////////////
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
@@ -404,23 +481,23 @@ fun markdownToHtml(inputName: String, outputName: String) {
  * Вывести в выходной файл процесс умножения столбиком числа lhv (> 0) на число rhv (> 0).
  *
  * Пример (для lhv == 19935, rhv == 111):
-   19935
-*    111
+19935
+ *    111
 --------
-   19935
+19935
 + 19935
 +19935
 --------
- 2212785
+2212785
  * Используемые пробелы, отступы и дефисы должны в точности соответствовать примеру.
  * Нули в множителе обрабатывать так же, как и остальные цифры:
-  235
-*  10
+235
+ *  10
 -----
-    0
+0
 +235
 -----
- 2350
+2350
  *
  */
 fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
@@ -434,21 +511,98 @@ fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
  * Вывести в выходной файл процесс деления столбиком числа lhv (> 0) на число rhv (> 0).
  *
  * Пример (для lhv == 19935, rhv == 22):
-  19935 | 22
- -198     906
- ----
-    13
-    -0
-    --
-    135
-   -132
-   ----
-      3
+19935 | 22
+-198     906
+----
+13
+-0
+--
+135
+-132
+----
+3
 
  * Используемые пробелы, отступы и дефисы должны в точности соответствовать примеру.
  *
  */
 fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
-    TODO()
+    val writer = File(outputName).bufferedWriter()
+    var minus = 0
+    var minus1: Int
+    var condition = 0
+    var deli2 = 0
+    val exp = lhv.toString().length - rhv.toString().length
+    writer.write(" $lhv | $rhv")
+    val size = " $lhv | $rhv".length - rhv.toString().length
+    var k = 0
+    if (lhv.toString().length < rhv.toString().length) minus1 = lhv
+    else {
+        if (rhv > lhv / 10.0.pow(exp)) {
+            minus = (lhv / 10.0.pow(exp - 1) / rhv).toInt() * rhv
+            minus1 = (lhv / 10.0.pow(exp - 1) - minus).toInt()
+            k = exp - 1
+        } else {
+            minus = (lhv / 10.0.pow(exp) / rhv * rhv).toInt()
+            minus1 = (lhv / 10.0.pow(exp) - minus).toInt()
+            k = exp
+        }
+    }
+    writer.newLine()
+    writer.write("-$minus")
+    var deli = "-$minus".length
+    for (i in 1..(size - deli)) {
+        writer.write(" ")
+    }
+    val ans1 = lhv / rhv
+    writer.write("$ans1")
+    fun append(lhv: Int, rhv: Int) {
+        condition++
+        writer.newLine()
+        if (condition != 1) {
+            for (i in 1..deli2) {
+                writer.write(" ")
+            }
+        }
+        for (i in 1..deli) {
+            writer.write("-")
+        }
+        val newDigit: Int = if (k > 0)
+            minus1 * 10 + (lhv % 10.0.pow(k) / 10.0.pow(k - 1)).toInt()
+        else minus1
+        writer.newLine()
+        minus = if (newDigit < rhv) {
+            0
+        } else {
+            newDigit / rhv * rhv
+        }
+        deli2 =
+            if (minus / 10 <= (newDigit / 10) && k != 0) lhv.toString().length - k + 2 - newDigit.toString().length
+            else lhv.toString().length - k + 1 - newDigit.toString().length
+        if (minus1 != 0 || newDigit == 0) {
+            for (i in 1..deli2) {
+                writer.write(" ")
+            }
+            writer.write("$newDigit")
+        } else {
+            for (i in 1 until deli2) {
+                writer.write(" ")
+            }
+            writer.write("0$newDigit")
+        }
+        if (k > 0) {
+            k -= 1
+            writer.newLine()
+            if (minus / 10 >= (newDigit / 10)) deli2 -= 1
+            for (i in 1..deli2) {
+                writer.write(" ")
+            }
+            writer.write("-$minus")
+            deli = "-$minus".length
+            minus1 = newDigit - minus
+            append(lhv, rhv)
+        }
+    }
+    if (condition == 0) append(lhv, rhv)
+    writer.close()
 }
 
