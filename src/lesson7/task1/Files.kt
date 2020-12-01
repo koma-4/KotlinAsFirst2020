@@ -91,12 +91,13 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
     }
     for (line in File(inputName).readLines()) {
         for ((key, value) in res) {
-            if (Regex(key.toLowerCase()).containsMatchIn(line.toLowerCase()))
-                if (key.toLowerCase().toSet().size == 1)
-                    res[key] = value + (line.length - line.toLowerCase()
-                        .replace(key.toLowerCase(), "").length) / key.toSet().size
-                else res[key] = value + (line.length - line.toLowerCase()
-                    .replace(key.toLowerCase(), "").length) / key.toList().size
+            val pattern = key.toLowerCase()
+            if (Regex("""\$pattern""").containsMatchIn(line.toLowerCase())) {
+                if (key.toLowerCase().toSet().size == 1 && key.length == 2) res[key] =
+                    value + Regex("""\$pattern""").findAll(line.toLowerCase()).count() * 2
+                else res[key] =
+                    value + Regex("""\$pattern""").findAll(line.toLowerCase()).count()
+            }
         }
     }
     return res
@@ -331,7 +332,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
                     val replacement = Regex("""\*\*\*([^*]+)\*\*\*""").find(newLine)?.groupValues?.get(1)
                     newLine = Regex("""\*\*\*[^*]+\*\*\*""").replaceFirst(
                         newLine,
-                        "<b><i>\\$replacement</b></i>"
+                        "<b><i>\\$replacement</i></b>"
                     )
                 }
                 while (newLine.contains(Regex("""\*\*[^*]+\*\*"""))) {
@@ -534,9 +535,9 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     var minus1: Int
     var condition = 0
     var deli2 = 0
-    val exp = lhv.toString().length - rhv.toString().length
+    val exp = "$lhv".length - "$rhv".length
     writer.write(" $lhv | $rhv")
-    val size = " $lhv | $rhv".length - rhv.toString().length
+    val size = " $lhv | $rhv".length - "$rhv".length
     var k = 0
     if (lhv.toString().length < rhv.toString().length) minus1 = lhv
     else {
@@ -560,22 +561,14 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     writer.newLine()
     writer.write("-$minus")
     var deli = "-$minus".length
-    for (i in 1..(size - deli)) {
-        writer.write(" ")
-    }
+    writer.write(" ".repeat(size - deli))
     val ans1 = lhv / rhv
     writer.write("$ans1")
     fun append(lhv: Int, rhv: Int) {
         condition++
         writer.newLine()
-        if (condition != 1) {
-            for (i in 1..deli2) {
-                writer.write(" ")
-            }
-        }
-        for (i in 1..deli) {
-            writer.write("-")
-        }
+        if (condition != 1) writer.write(" ".repeat(deli2))
+        writer.write("-".repeat(deli))
         val newDigit: Int = if (k > 0)
             minus1 * 10 + (lhv % 10.0.pow(k) / 10.0.pow(k - 1)).toInt()
         else minus1
@@ -586,29 +579,25 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
             newDigit / rhv * rhv
         }
         deli2 =
-            if (minus / 10 <= (newDigit / 10) && k != 0) lhv.toString().length - k + 2 - newDigit.toString().length
-            else lhv.toString().length - k + 1 - newDigit.toString().length
+            if (minus / 10 <= (newDigit / 10) && k != 0) "$lhv".length - k + 2 - "$newDigit".length
+            else "$lhv".length - k + 1 - "$newDigit".length
         if (minus1 != 0 || k < 1) {
-            for (i in 1..deli2) {
-                writer.write(" ")
-            }
+            writer.write(" ".repeat(deli2))
             writer.write("$newDigit")
         } else {
-            for (i in 1 until deli2) {
-                writer.write(" ")
-            }
+            writer.write(" ".repeat(deli2 - 1))
             writer.write("0$newDigit")
         }
         if (k > 0) {
             k -= 1
             writer.newLine()
-            if (minus.toString().length == newDigit.toString().length) deli2 -= 1
-            for (i in 1..deli2) {
-                writer.write(" ")
-            }
+            deli2 = deli2 + "$newDigit".length - "$minus".length - 1
+            writer.write(" ".repeat(deli2))
             writer.write("-$minus")
-            deli = "-$minus".length
+            deli = if ("$newDigit".length <= "-$minus".length) "-$minus".length
+            else "$newDigit".length
             minus1 = newDigit - minus
+            if (k == 0 && ("$newDigit".length > "-$minus".length)) deli2 -= "$newDigit".length - "-$minus".length
             append(lhv, rhv)
         }
     }
