@@ -334,13 +334,17 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
                         "<b><i>\\$replacement</b></i>"
                     )
                 }
-                while (newLine.contains(Regex("""\*\*[^*{2}]+\*\*"""))) {
-                    val replacement = Regex("""\*\*([^*{2}]+)\*\*""").find(newLine)?.groupValues?.get(1)
-                    newLine = Regex("""\*\*[^*{2}]+\*\*""").replaceFirst(
-                        newLine,
-                        "<b>\\$replacement</b>"
-                    )
+                fun helper(line: String) {
+                    newLine = line
+                    while (newLine.contains(Regex("""\*\*[^*]+\*\*"""))) {
+                        val replacement = Regex("""\*\*([^*]+)\*\*""").find(newLine)?.groupValues?.get(1)
+                        newLine = Regex("""\*\*[^*]+\*\*""").replaceFirst(
+                            newLine,
+                            "<b>\\$replacement</b>"
+                        )
+                    }
                 }
+                helper(newLine)
                 while (newLine.contains(Regex("""\*[^*]+\*"""))) {
                     val replacement = Regex("""\*([^*]+)\*""").find(newLine)?.groupValues?.get(1)
                     newLine =
@@ -349,6 +353,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
                             "<i>\\$replacement</i>"
                         )
                 }
+                helper(newLine)
                 while (newLine.contains(Regex("""~~[^~]+~~"""))) {
                     val replacement = Regex("""~~([^~]+)~~""").find(newLine)?.groupValues?.get(1)
                     newLine = Regex("""~~[^~]+~~""").replaceFirst(newLine, "<s>\\$replacement</s>")
@@ -588,7 +593,7 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
         deli2 =
             if (minus / 10 <= (newDigit / 10) && k != 0) lhv.toString().length - k + 2 - newDigit.toString().length
             else lhv.toString().length - k + 1 - newDigit.toString().length
-        if (minus1 != 0 || newDigit == 0) {
+        if (minus1 != 0 || k < 1) {
             for (i in 1..deli2) {
                 writer.write(" ")
             }
