@@ -632,7 +632,7 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
             deli = if ("$newDigit".length <= "-$minus".length) "-$minus".length
             else "$newDigit".length
             minus1 = newDigit - minus
-            if (k == 0 && ("$newDigit".length > "-$minus".length)) deli2 -= "$newDigit".length - "-$minus".length
+            if ("$newDigit".length > "-$minus".length) deli2 -= "$newDigit".length - "-$minus".length
             append(lhv, rhv)
         }
     }
