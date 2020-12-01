@@ -334,17 +334,13 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
                         "<b><i>\\$replacement</b></i>"
                     )
                 }
-                fun helper(line: String) {
-                    newLine = line
-                    while (newLine.contains(Regex("""\*\*[^*]+\*\*"""))) {
-                        val replacement = Regex("""\*\*([^*]+)\*\*""").find(newLine)?.groupValues?.get(1)
-                        newLine = Regex("""\*\*[^*]+\*\*""").replaceFirst(
-                            newLine,
-                            "<b>\\$replacement</b>"
-                        )
-                    }
+                while (newLine.contains(Regex("""\*\*[^*]+\*\*"""))) {
+                    val replacement = Regex("""\*\*([^*]+)\*\*""").find(newLine)?.groupValues?.get(1)
+                    newLine = Regex("""\*\*[^*]+\*\*""").replaceFirst(
+                        newLine,
+                        "<b>\\$replacement</b>"
+                    )
                 }
-                helper(newLine)
                 while (newLine.contains(Regex("""\*[^*]+\*"""))) {
                     val replacement = Regex("""\*([^*]+)\*""").find(newLine)?.groupValues?.get(1)
                     newLine =
@@ -353,7 +349,6 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
                             "<i>\\$replacement</i>"
                         )
                 }
-                helper(newLine)
                 while (newLine.contains(Regex("""~~[^~]+~~"""))) {
                     val replacement = Regex("""~~([^~]+)~~""").find(newLine)?.groupValues?.get(1)
                     newLine = Regex("""~~[^~]+~~""").replaceFirst(newLine, "<s>\\$replacement</s>")
