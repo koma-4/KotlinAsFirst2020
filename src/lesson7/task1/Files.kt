@@ -2,6 +2,7 @@
 
 package lesson7.task1
 
+import lesson4.task1.isPalindrome
 import java.io.File
 import kotlin.math.pow
 
@@ -93,7 +94,7 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
         for ((key, value) in res) {
             val pattern = key.toLowerCase()
             if (Regex("""\$pattern""").containsMatchIn(line.toLowerCase())) {
-                if (key.toLowerCase().toSet().size == 1 && key.toList().size != 1) {
+                if (isPalindrome(key) && key.length > 1) {
                     val pattern1 = key.toLowerCase().toList()[0]
                     val newLine = Regex("""\$pattern""").replace(line.toLowerCase(), "$pattern1")
                     val count1 = Regex("""\$pattern""").findAll(line.toLowerCase()).count()
@@ -565,11 +566,8 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     var condition = 0
     var deli2 = 0
     val exp = "$lhv".length - "$rhv".length
-    if ("$lhv".length > "-$minus".length && rhv > lhv) writer.write("$lhv | $rhv")
-    else writer.write(" $lhv | $rhv")
-    val size = if ("$lhv".length > "-$minus".length && rhv > lhv) "$lhv | $rhv".length - "$rhv".length
-    else " $lhv | $rhv".length - "$rhv".length
     var k = 0
+    var s = 0
     if (lhv.toString().length < rhv.toString().length) minus1 = lhv
     else {
         when {
@@ -589,12 +587,18 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
             }
         }
     }
+    if ("$lhv".length > "-$minus".length && rhv > lhv || lhv / rhv < 10 && "$lhv".length == "-$minus".length) {
+        s++
+        writer.write("$lhv | $rhv")
+    } else writer.write(" $lhv | $rhv")
+    val size = if ("$lhv".length > "-$minus".length && rhv > lhv || s == 1) "$lhv | $rhv".length - "$rhv".length
+    else " $lhv | $rhv".length - "$rhv".length
     writer.newLine()
-    if ("$lhv".length > "-$minus".length && rhv > lhv) writer.write(" ".repeat("$lhv".length - "-$minus".length))
+    if ("$lhv".length > "-$minus".length && rhv > lhv || s == 1) writer.write(" ".repeat("$lhv".length - "-$minus".length))
     writer.write("-$minus")
-    var deli = if (rhv > lhv && "$lhv".length > "-$minus".length) "$lhv".length
+    var deli = if (rhv > lhv && "$lhv".length > "-$minus".length || s == 1) "$lhv".length
     else "-$minus".length
-    if (rhv > lhv && "$lhv".length > "-$minus".length) writer.write(" ".repeat(size - "$lhv".length))
+    if (rhv > lhv && "$lhv".length > "-$minus".length || s == 1) writer.write(" ".repeat(size - "$lhv".length))
     else writer.write(" ".repeat(size - deli))
     val ans1 = lhv / rhv
     writer.write("$ans1")
@@ -614,7 +618,7 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
         }
         deli2 =
             if (minus / 10 <= (newDigit / 10) && k != 0) "$lhv".length - k + 2 - "$newDigit".length
-            else if ("$lhv".length > "-$minus".length && rhv > lhv) "$lhv".length - k - "$newDigit".length
+            else if ("$lhv".length > "-$minus".length && rhv > lhv || s == 1) "$lhv".length - k - "$newDigit".length
             else "$lhv".length - k + 1 - "$newDigit".length
         if (minus1 != 0 || k < 1) {
             writer.write(" ".repeat(deli2))
