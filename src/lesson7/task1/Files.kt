@@ -93,9 +93,12 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
         for ((key, value) in res) {
             val pattern = key.toLowerCase()
             if (Regex("""\$pattern""").containsMatchIn(line.toLowerCase())) {
-                if (key.toLowerCase().toSet().size == 1 && key.length == 2) res[key] =
-                    value + Regex("""\$pattern""").findAll(line.toLowerCase()).count() * 2
-                else res[key] =
+                if (key.toLowerCase().toSet().size == 1 && key.toList().size != 1) {
+                    val pattern1 = key.toLowerCase().toList()[0]
+                    val newLine = Regex("""\$pattern""").replace(line.toLowerCase(), "$pattern1")
+                    val count1 = Regex("""\$pattern""").findAll(line.toLowerCase()).count()
+                    res[key] = value + Regex("""\$pattern""").findAll(newLine).count() + count1
+                } else res[key] =
                     value + Regex("""\$pattern""").findAll(line.toLowerCase()).count()
             }
         }
@@ -335,12 +338,38 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
                         "<b><i>\\$replacement</i></b>"
                     )
                 }
+                while (newLine.contains(Regex("""\*\*\*[^*]+\*[^*]+\*\*"""))) {
+                    val replacement = Regex("""\*\*\*([^*]+)\*[^*]+\*\*""").find(newLine)?.groupValues?.get(1)
+                    val replacement1 = Regex("""\*\*\*[^*]+\*([^*]+)\*\*""").find(newLine)?.groupValues?.get(1)
+                    newLine = Regex("""\*\*\*[^*]+\*[^*]+\*\*""").replaceFirst(
+                        newLine,
+                        "<b><i>\\$replacement</i>\\$replacement1</b>"
+                    )
+                }
+                while (newLine.contains(Regex("""\*\*[^*]+\*[^*]+\*\*\*"""))) {
+                    val replacement = Regex("""\*\*([^*]+)\*[^*]+\*\*\*""").find(newLine)?.groupValues?.get(1)
+                    val replacement1 = Regex("""\*\*[^*]+\*([^*]+)\*\*\*""").find(newLine)?.groupValues?.get(1)
+                    newLine = Regex("""\*\*[^*]+\*[^*]+\*\*\*""").replaceFirst(
+                        newLine,
+                        "<b><\\$replacement<i>\\$replacement1</i></b>"
+                    )
+                }
+                while (newLine.contains(Regex("""\*\*[^*]+\*[^*]+\*[^*]+\*\*"""))) {
+                    val replacement = Regex("""\*\*([^*]+)\*[^*]+\*[^*]+\*\*""").find(newLine)?.groupValues?.get(1)
+                    val replacement1 = Regex("""\*\*[^*]+\*([^*]+)\*[^*]+\*\*""").find(newLine)?.groupValues?.get(1)
+                    val replacement2 = Regex("""\*\*[^*]+\*[^*]+\*([^*]+)\*\*""").find(newLine)?.groupValues?.get(1)
+                    newLine = Regex("""\*\*[^*]+\*[^*]+\*[^*]+\*\*""").replaceFirst(
+                        newLine,
+                        "<b>\\$replacement<i>\\$replacement1</i>\\$replacement2</b>"
+                    )
+                }
                 while (newLine.contains(Regex("""\*\*[^*]+\*\*"""))) {
                     val replacement = Regex("""\*\*([^*]+)\*\*""").find(newLine)?.groupValues?.get(1)
-                    newLine = Regex("""\*\*[^*]+\*\*""").replaceFirst(
-                        newLine,
-                        "<b>\\$replacement</b>"
-                    )
+                    newLine =
+                        Regex("""\*\*[^*]+\*\*""").replaceFirst(
+                            newLine,
+                            "<b>\\$replacement</b>"
+                        )
                 }
                 while (newLine.contains(Regex("""\*[^*]+\*"""))) {
                     val replacement = Regex("""\*([^*]+)\*""").find(newLine)?.groupValues?.get(1)
@@ -536,8 +565,10 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     var condition = 0
     var deli2 = 0
     val exp = "$lhv".length - "$rhv".length
-    writer.write(" $lhv | $rhv")
-    val size = " $lhv | $rhv".length - "$rhv".length
+    if ("$lhv".length > "-$minus".length && rhv > lhv) writer.write("$lhv | $rhv")
+    else writer.write(" $lhv | $rhv")
+    val size = if ("$lhv".length > "-$minus".length && rhv > lhv) "$lhv | $rhv".length - "$rhv".length
+    else " $lhv | $rhv".length - "$rhv".length
     var k = 0
     if (lhv.toString().length < rhv.toString().length) minus1 = lhv
     else {
@@ -559,9 +590,12 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
         }
     }
     writer.newLine()
+    if ("$lhv".length > "-$minus".length && rhv > lhv) writer.write(" ".repeat("$lhv".length - "-$minus".length))
     writer.write("-$minus")
-    var deli = "-$minus".length
-    writer.write(" ".repeat(size - deli))
+    var deli = if (rhv > lhv && "$lhv".length > "-$minus".length) "$lhv".length
+    else "-$minus".length
+    if (rhv > lhv && "$lhv".length > "-$minus".length) writer.write(" ".repeat(size - "$lhv".length))
+    else writer.write(" ".repeat(size - deli))
     val ans1 = lhv / rhv
     writer.write("$ans1")
     fun append(lhv: Int, rhv: Int) {
@@ -580,6 +614,7 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
         }
         deli2 =
             if (minus / 10 <= (newDigit / 10) && k != 0) "$lhv".length - k + 2 - "$newDigit".length
+            else if ("$lhv".length > "-$minus".length && rhv > lhv) "$lhv".length - k - "$newDigit".length
             else "$lhv".length - k + 1 - "$newDigit".length
         if (minus1 != 0 || k < 1) {
             writer.write(" ".repeat(deli2))
