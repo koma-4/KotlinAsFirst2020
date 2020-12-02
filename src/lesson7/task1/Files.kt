@@ -343,50 +343,58 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
                         "<b><i>\\$each</i></b>"
                     )
                 }
-                while (newLine.contains(Regex("""\*\*\*[^*]+\*[^*]+\*\*"""))) {
-                    val replacement = Regex("""\*\*\*([^*]+)\*[^*]+\*\*""").find(newLine)?.groupValues?.get(1)
-                    val replacement1 = Regex("""\*\*\*[^*]+\*([^*]+)\*\*""").find(newLine)?.groupValues?.get(1)
+                val list1_1 = Regex("""\*\*\*([^*]+)\*[^*]+\*\*""").findAll(newLine).map { it.groupValues[1] }.toList()
+                val list1_2 = Regex("""\*\*\*[^*]+\*([^*]+)\*\*""").findAll(newLine).map { it.groupValues[1] }.toList()
+                for (i in list1_1.indices) {
+                    val a = list1_1[i]
+                    val b = list1_2[i]
                     newLine = Regex("""\*\*\*[^*]+\*[^*]+\*\*""").replaceFirst(
                         newLine,
-                        "<b><i>\\$replacement</i>\\$replacement1</b>"
+                        "<b><i>\\$a</i>\\$b</b>"
                     )
                 }
-                while (newLine.contains(Regex("""\*\*[^*]+\*[^*]+\*\*\*"""))) {
-                    val replacement = Regex("""\*\*([^*]+)\*[^*]+\*\*\*""").find(newLine)?.groupValues?.get(1)
-                    val replacement1 = Regex("""\*\*[^*]+\*([^*]+)\*\*\*""").find(newLine)?.groupValues?.get(1)
+                val list2_1 = Regex("""\*\*([^*]+)\*[^*]+\*\*\*""").findAll(newLine).map { it.groupValues[1] }.toList()
+                val list2_2 = Regex("""\*\*[^*]+\*([^*]+)\*\*\*""").findAll(newLine).map { it.groupValues[1] }.toList()
+                for (i in list2_1.indices) {
+                    val a = list2_1[i]
+                    val b = list2_2[i]
                     newLine = Regex("""\*\*[^*]+\*[^*]+\*\*\*""").replaceFirst(
                         newLine,
-                        "<b><\\$replacement<i>\\$replacement1</i></b>"
+                        "<b>\\$a<i>\\$b</i></b>"
                     )
                 }
-                while (newLine.contains(Regex("""\*\*[^*]+\*[^*]+\*[^*]+\*\*"""))) {
-                    val replacement = Regex("""\*\*([^*]+)\*[^*]+\*[^*]+\*\*""").find(newLine)?.groupValues?.get(1)
-                    val replacement1 = Regex("""\*\*[^*]+\*([^*]+)\*[^*]+\*\*""").find(newLine)?.groupValues?.get(1)
-                    val replacement2 = Regex("""\*\*[^*]+\*[^*]+\*([^*]+)\*\*""").find(newLine)?.groupValues?.get(1)
+                val list3_1 = Regex("""\*\*([^*]+)\*[^*]+\*[^*]+\*\*""").findAll(newLine).map { it.groupValues[1] }.toList()
+                val list3_2 = Regex("""\*\*[^*]+\*([^*]+)\*[^*]+\*\*""").findAll(newLine).map { it.groupValues[1] }.toList()
+                val list3_3 = Regex("""\*\*[^*]+\*[^*]+\*([^*]+)\*\*""").findAll(newLine).map { it.groupValues[1] }.toList()
+                for (i in list3_1.indices) {
+                    val a = list3_1[i]
+                    val b = list3_2[i]
+                    val c = list3_3[i]
                     newLine = Regex("""\*\*[^*]+\*[^*]+\*[^*]+\*\*""").replaceFirst(
                         newLine,
-                        "<b>\\$replacement<i>\\$replacement1</i>\\$replacement2</b>"
+                        "<b>\\$a<i>\\$b</i>\\$c</b>"
                     )
                 }
-                while (newLine.contains(Regex("""\*\*[^*]+\*\*"""))) {
-                    val replacement = Regex("""\*\*([^*]+)\*\*""").find(newLine)?.groupValues?.get(1)
-                    newLine =
-                        Regex("""\*\*[^*]+\*\*""").replaceFirst(
-                            newLine,
-                            "<b>\\$replacement</b>"
-                        )
+                val list4 = Regex("""\*\*([^*]+)\*\*""").findAll(newLine).map { it.groupValues[1] }.toList()
+                for (each in list4) {
+                    newLine = Regex("""\*\*[^*]+\*\*""").replaceFirst(
+                        newLine,
+                        "<b>\\$each</b>"
+                    )
                 }
-                while (newLine.contains(Regex("""\*[^*]+\*"""))) {
-                    val replacement = Regex("""\*([^*]+)\*""").find(newLine)?.groupValues?.get(1)
-                    newLine =
-                        Regex("""\*[^*]+\*""").replaceFirst(
-                            newLine,
-                            "<i>\\$replacement</i>"
-                        )
+                val list5 = Regex("""\*([^*]+)\*""").findAll(newLine).map { it.groupValues[1] }.toList()
+                for (each in list5) {
+                    newLine = Regex("""\*[^*]+\*""").replaceFirst(
+                        newLine,
+                        "<i>\\$each</i>"
+                    )
                 }
-                while (newLine.contains(Regex("""~~[^~]+~~"""))) {
-                    val replacement = Regex("""~~([^~]+)~~""").find(newLine)?.groupValues?.get(1)
-                    newLine = Regex("""~~[^~]+~~""").replaceFirst(newLine, "<s>\\$replacement</s>")
+                val list6 = Regex("""~~([^~]+)~~""").findAll(newLine).map { it.groupValues[1] }.toList()
+                for (each in list6) {
+                    newLine = Regex("""~~[^~]+~~""").replaceFirst(
+                        newLine,
+                        "<s>\\$each</s>"
+                    )
                 }
                 it.write(newLine)
             }
