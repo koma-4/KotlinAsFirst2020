@@ -87,20 +87,24 @@ fun deleteMarked(inputName: String, outputName: String) {
  */
 fun countSubstrings(inputName: String, substrings: List<String>): Map<String, Int> {
     val res = mutableMapOf<String, Int>()
+    val list = listOf('.', '[', '^', '$', '?', '|', '*', '+', '(', ')', '\\')
     for (each in substrings) {
         res[each] = 0
     }
     for (line in File(inputName).readLines()) {
         for ((key, value) in res) {
-            val pattern = key.toLowerCase()
-            if (Regex("""\$pattern""").containsMatchIn(line.toLowerCase())) {
+            var pattern = key.toLowerCase()
+            for (char in pattern) {
+                if (char in list) pattern = pattern.replace(char.toString(), "\\$char")
+            }
+            if (Regex(pattern).containsMatchIn(line.toLowerCase())) {
                 if (isPalindrome(key) && key.length > 1) {
                     val pattern1 = key.toLowerCase().toList()[0]
-                    val newLine = Regex("""\$pattern""").replace(line.toLowerCase(), "$pattern1")
-                    val count1 = Regex("""\$pattern""").findAll(line.toLowerCase()).count()
-                    res[key] = value + Regex("""\$pattern""").findAll(newLine).count() + count1
+                    val newLine = Regex(pattern).replace(line.toLowerCase(), "$pattern1")
+                    val count1 = Regex(pattern).findAll(line.toLowerCase()).count()
+                    res[key] = value + Regex(pattern).findAll(newLine).count() + count1
                 } else res[key] =
-                    value + Regex("""\$pattern""").findAll(line.toLowerCase()).count()
+                    value + Regex(pattern).findAll(line.toLowerCase()).count()
             }
         }
     }
@@ -332,11 +336,11 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
                 }
                 it.newLine()
                 var newLine = line
-                while (newLine.contains(Regex("""\*\*\*[^*]+\*\*\*"""))) {
-                    val replacement = Regex("""\*\*\*([^*]+)\*\*\*""").find(newLine)?.groupValues?.get(1)
+                val list = Regex("""\*\*\*([^*]+)\*\*\*""").findAll(newLine).map { it.groupValues[1] }.toList()
+                for (each in list) {
                     newLine = Regex("""\*\*\*[^*]+\*\*\*""").replaceFirst(
                         newLine,
-                        "<b><i>\\$replacement</i></b>"
+                        "<b><i>\\$each</i></b>"
                     )
                 }
                 while (newLine.contains(Regex("""\*\*\*[^*]+\*[^*]+\*\*"""))) {
