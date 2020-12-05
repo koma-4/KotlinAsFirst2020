@@ -87,25 +87,34 @@ fun deleteMarked(inputName: String, outputName: String) {
  */
 fun countSubstrings(inputName: String, substrings: List<String>): Map<String, Int> {
     val res = mutableMapOf<String, Int>()
-    val list = listOf('.', '[', '^', '$', '?', '|', '*', '+', '(', ')', '\\')
+    val list = setOf('.', '[', '^', '$', '?', '|', '*', '+', '(', ')', '\\')
     for (each in substrings) {
         res[each] = 0
     }
     for (line in File(inputName).readLines()) {
         for ((key, value) in res) {
+            var k = 0
+            var c = 1
             var pattern = key.toLowerCase()
             for (char in pattern) {
                 if (char in list) pattern = pattern.replace(char.toString(), "\\$char")
             }
-            if (Regex(pattern).containsMatchIn(line.toLowerCase())) {
-                if (isPalindrome(key) && key.length > 1) {
-                    val pattern1 = key.toLowerCase().toList()[0]
-                    val newLine = Regex(pattern).replace(line.toLowerCase(), "$pattern1")
-                    val count1 = Regex(pattern).findAll(line.toLowerCase()).count()
-                    res[key] = value + Regex(pattern).findAll(newLine).count() + count1
-                } else res[key] =
-                    value + Regex(pattern).findAll(line.toLowerCase()).count()
+            for (i in line.indices) {
+                if (Regex(pattern).find(line.toLowerCase(), i) != null) {
+                    if (pattern.contains("\\")) pattern = pattern.replace("\\","")
+                    var j = i
+                    for (each in pattern) {   //этот цикл нужен для того, чтобы записывалось совпадение только, когда до него доберёмся
+                        if (j <= line.lastIndex) {
+                            if (each != line.toLowerCase()[j]) c = 0
+                            j++
+                        } else c = 0
+                        if (c == 0) break
+                    }
+                    if (c == 1) k++
+                    c = 1
+                }
             }
+            res[key] = value + k
         }
     }
     return res
@@ -340,65 +349,49 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
                 }
                 it.newLine()
                 var newLine = line
+
                 val list = Regex("""\*\*\*([^*]+)\*\*\*""").findAll(newLine).map { it.groupValues[1] }.toList()
                 for (each in list) {
-                    newLine = Regex("""\*\*\*[^*]+\*\*\*""").replaceFirst(
-                        newLine,
-                        "<b><i>\\$each</i></b>"
-                    )
+                    newLine = newLine.replaceFirst("***$each***", "<b><i>$each</i></b>")
                 }
-                val list1_1 = Regex("""\*\*\*([^*]+)\*[^*]+\*\*""").findAll(newLine).map { it.groupValues[1] }.toList()
+                val list1_1 =
+                    Regex("""\*\*\*([^*]+)\*([^*]+)\*\*""").findAll(newLine).map { it.groupValues[1] }.toList()
                 val list1_2 = Regex("""\*\*\*[^*]+\*([^*]+)\*\*""").findAll(newLine).map { it.groupValues[1] }.toList()
                 for (i in list1_1.indices) {
                     val a = list1_1[i]
                     val b = list1_2[i]
-                    newLine = Regex("""\*\*\*[^*]+\*[^*]+\*\*""").replaceFirst(
-                        newLine,
-                        "<b><i>\\$a</i>\\$b</b>"
-                    )
+                    newLine = newLine.replaceFirst("***$a*$b**", "<b><i>$a</i>$b</b>")
                 }
                 val list2_1 = Regex("""\*\*([^*]+)\*[^*]+\*\*\*""").findAll(newLine).map { it.groupValues[1] }.toList()
                 val list2_2 = Regex("""\*\*[^*]+\*([^*]+)\*\*\*""").findAll(newLine).map { it.groupValues[1] }.toList()
                 for (i in list2_1.indices) {
                     val a = list2_1[i]
                     val b = list2_2[i]
-                    newLine = Regex("""\*\*[^*]+\*[^*]+\*\*\*""").replaceFirst(
-                        newLine,
-                        "<b>\\$a<i>\\$b</i></b>"
-                    )
+                    newLine = newLine.replaceFirst("**$a*$b***", "<b>$a<i>$b</i></b>")
                 }
-                val list3_1 = Regex("""\*\*([^*]+)\*[^*]+\*[^*]+\*\*""").findAll(newLine).map { it.groupValues[1] }.toList()
-                val list3_2 = Regex("""\*\*[^*]+\*([^*]+)\*[^*]+\*\*""").findAll(newLine).map { it.groupValues[1] }.toList()
-                val list3_3 = Regex("""\*\*[^*]+\*[^*]+\*([^*]+)\*\*""").findAll(newLine).map { it.groupValues[1] }.toList()
+                val list3_1 =
+                    Regex("""\*\*([^*]+)\*[^*]+\*[^*]+\*\*""").findAll(newLine).map { it.groupValues[1] }.toList()
+                val list3_2 =
+                    Regex("""\*\*[^*]+\*([^*]+)\*[^*]+\*\*""").findAll(newLine).map { it.groupValues[1] }.toList()
+                val list3_3 =
+                    Regex("""\*\*[^*]+\*[^*]+\*([^*]+)\*\*""").findAll(newLine).map { it.groupValues[1] }.toList()
                 for (i in list3_1.indices) {
                     val a = list3_1[i]
                     val b = list3_2[i]
                     val c = list3_3[i]
-                    newLine = Regex("""\*\*[^*]+\*[^*]+\*[^*]+\*\*""").replaceFirst(
-                        newLine,
-                        "<b>\\$a<i>\\$b</i>\\$c</b>"
-                    )
+                    newLine = newLine.replaceFirst("**$a*$b*$c**", "<b>$a<i>$b</i>$c</b>")
                 }
                 val list4 = Regex("""\*\*([^*]+)\*\*""").findAll(newLine).map { it.groupValues[1] }.toList()
                 for (each in list4) {
-                    newLine = Regex("""\*\*[^*]+\*\*""").replaceFirst(
-                        newLine,
-                        "<b>\\$each</b>"
-                    )
+                    newLine = newLine.replaceFirst("**$each**", "<b>$each</b>")
                 }
                 val list5 = Regex("""\*([^*]+)\*""").findAll(newLine).map { it.groupValues[1] }.toList()
                 for (each in list5) {
-                    newLine = Regex("""\*[^*]+\*""").replaceFirst(
-                        newLine,
-                        "<i>\\$each</i>"
-                    )
+                    newLine = newLine.replaceFirst("*$each*", "<i>$each</i>")
                 }
                 val list6 = Regex("""~~([^~]+)~~""").findAll(newLine).map { it.groupValues[1] }.toList()
                 for (each in list6) {
-                    newLine = Regex("""~~[^~]+~~""").replaceFirst(
-                        newLine,
-                        "<s>\\$each</s>"
-                    )
+                    newLine = newLine.replaceFirst("~~$each~~", "<s>$each</s>")
                 }
                 it.write(newLine)
             }
