@@ -591,7 +591,8 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     val size = if ("$lhv".length > "-$minus".length && rhv > lhv || s == 1) "$lhv | $rhv".length - "$rhv".length
     else " $lhv | $rhv".length - "$rhv".length
     writer.newLine()
-    if ("$lhv".length > "-$minus".length && rhv > lhv || s == 1) writer.write(" ".repeat("$lhv".length - "-$minus".length))
+    if ("$lhv".length > "-$minus".length && rhv > lhv || s == 1)
+        writer.write(" ".repeat("$lhv".length - "-$minus".length))
     writer.write("-$minus")
     var deli = if (rhv > lhv && "$lhv".length > "-$minus".length || s == 1) "$lhv".length
     else "-$minus".length
