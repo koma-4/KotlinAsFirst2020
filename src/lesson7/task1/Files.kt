@@ -100,10 +100,12 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
         for (line in File(inputName).readLines()) {
             if (Regex(pattern).containsMatchIn(line.toLowerCase())) {
                 var i = 0
-                while (i <= line.lastIndex && Regex(pattern).find(line.toLowerCase(), i) != null) {
-                    i = if (key.length == 1) Regex(pattern).find(line.toLowerCase(), i)?.range?.last!! + 1
-                    else Regex(pattern).find(line.toLowerCase(), i)?.range?.last!!
+                var finded = Regex(pattern).find(line.toLowerCase(), i)
+                while (i <= line.lastIndex && finded != null) {
+                    i = if (key.length == 1) finded.range.last + 1
+                    else finded.range.last
                     res1.add(i)
+                    finded = Regex(pattern).find(line.toLowerCase(), i)
                 }
             }
         }
@@ -319,6 +321,10 @@ Suspendisse <s>et elit in enim tempus iaculis</s>.
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
     var k1 = 0
     var k2 = 0
+    var bold = "<b>"
+    var italic = "<i>"
+    var crossedOut = "<s>"
+    var lastStep = 0
     File(outputName).bufferedWriter().use {
         it.write("<html>")
         it.newLine()
@@ -341,35 +347,37 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
                 }
                 it.newLine()
                 var newLine = line
-                val list = Regex("""\*\*\*([^*]+)\*\*\*""").findAll(newLine).map { it.groupValues[1] }.toList()
-                for (each in list) {
-                    newLine = newLine.replaceFirst("***$each***", "<b><i>$each</i></b>")
+                var i = 0
+                while (i <= newLine.lastIndex) {
+                    val step1 = Regex("""\*\*""").find(newLine, i)
+                    val step2 = Regex("""\*""").find(newLine, i)
+                    if (step1 != null && bold == "<b>" && step1.range.first <= step2!!.range.first) {
+                        newLine = newLine.replaceFirst("**", bold)
+                        i = step1.range.last + 2
+                        bold = "</b>"
+                        lastStep = 0
+                    } else if (step1 != null && bold == "</b>" && lastStep != 2 &&
+                        step1.range.first <= step2!!.range.first) {    // 3 и 4 условия для последовательного перебора
+                        newLine = newLine.replaceFirst("**", bold)
+                        i = step1.range.last + 3
+                        bold = "<b>"
+                        lastStep = 1
+                    } else if (step2 != null && italic == "<i>") {
+                        newLine = newLine.replaceFirst("*", italic)
+                        i = step2.range.last + 3
+                        italic = "</i>"
+                        lastStep = 2
+                    } else if (step2 != null && italic == "</i>") {
+                        newLine = newLine.replaceFirst("*", italic)
+                        i = step2.range.last + 4
+                        italic = "<i>"
+                        lastStep = 3
+                    } else i = newLine.lastIndex + 1
                 }
-                val list1 =
-                    Regex("""\*\*(\*[^*]+\*[^*]+)+\*\*""").findAll(newLine).map { it.groupValues[1] }.toList()
-                for (each in list1) {
-                    newLine = newLine.replaceFirst("**$each**", "<b>$each</b>")
-                }
-                val list2 = Regex("""\*\*([^*]+\*[^*]+\*)+\*\*""").findAll(newLine).map { it.groupValues[1] }.toList()
-                for (each in list2) {
-                    newLine = newLine.replaceFirst("**$each***", "<b>$each</b>")
-                }
-                val list3 =
-                    Regex("""\*\*(([^*]+)\*[^*]+\*[^*]+)+\*\*""").findAll(newLine).map { it.groupValues[1] }.toList()
-                for (each in list3) {
-                    newLine = newLine.replaceFirst("**$each**", "<b>$each</b>")
-                }
-                val list4 = Regex("""\*\*([^*]+)\*\*""").findAll(newLine).map { it.groupValues[1] }.toList()
-                for (each in list4) {
-                    newLine = newLine.replaceFirst("**$each**", "<b>$each</b>")
-                }
-                val list5 = Regex("""\*([^*]+)\*""").findAll(newLine).map { it.groupValues[1] }.toList()
-                for (each in list5) {
-                    newLine = newLine.replaceFirst("*$each*", "<i>$each</i>")
-                }
-                val list6 = Regex("""~~([^~]+)~~""").findAll(newLine).map { it.groupValues[1] }.toList()
-                for (each in list6) {
-                    newLine = newLine.replaceFirst("~~$each~~", "<s>$each</s>")
+                while (newLine.contains("~~")) {
+                    newLine = newLine.replaceFirst("~~", crossedOut)
+                    crossedOut = if (crossedOut == "<s>") "</s>"
+                    else "<s>"
                 }
                 it.write(newLine)
             }
