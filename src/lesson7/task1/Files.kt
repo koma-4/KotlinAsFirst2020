@@ -338,14 +338,15 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
                     it.newLine()
                     it.write("</p>")
                     k1 = 1
+                    k2 = 0
                 }
             } else {
+                k2 = 1
                 if (k1 == k2 && k2 != 0) {
                     it.newLine()
                     it.write("<p>")
                     k1 = 0
                 }
-                k2 = 1
                 it.newLine()
                 var newLine = line
                 var i = 0
