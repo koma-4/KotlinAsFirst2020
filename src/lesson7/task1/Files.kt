@@ -330,21 +330,22 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
         it.newLine()
         it.write("<body>")
         it.newLine()
+        it.write("<p>")
+        it.newLine()
         for (line in File(inputName).readLines()) {
             if (line.isEmpty()) {
-                if (k2 == 0) {
+                if (k2 != 0) {
                     it.newLine()
-                    it.write("<p>")
+                    it.write("</p>")
+                    k1 = 1
                 }
-                it.newLine()
-                it.write("</p>")
-                k1++
             } else {
-                if (k1 == k2) {
+                if (k1 == k2 && k2 != 0) {
                     it.newLine()
                     it.write("<p>")
-                    k2++
+                    k1 = 0
                 }
+                k2 = 1
                 it.newLine()
                 var newLine = line
                 var i = 0
