@@ -324,6 +324,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
     var italic = "<i>"
     var crossedOut = "<s>"
     var lastStep = 0
+    var lastline = 1
     File(outputName).bufferedWriter().use {
         it.write("<html>")
         it.newLine()
@@ -338,6 +339,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
                     it.write("</p>")
                     k1 = 1
                     k2 = 0
+                    lastline = 0
                 }
             } else {
                 k2 = 1
@@ -358,7 +360,8 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
                         bold = "</b>"
                         lastStep = 0
                     } else if (step1 != null && bold == "</b>" && lastStep != 2 &&
-                        step1.range.first <= step2!!.range.first) {    // 3 и 4 условия для последовательного перебора
+                        step1.range.first <= step2!!.range.first
+                    ) {    // 3 и 4 условия для последовательного перебора
                         newLine = newLine.replaceFirst("**", bold)
                         i = step1.range.last + 3
                         bold = "<b>"
@@ -381,10 +384,13 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
                     else "<s>"
                 }
                 it.write(newLine)
+                lastline = 1
             }
         }
-        it.newLine()
-        it.write("</p>")
+        if (lastline == 1) {
+            it.newLine()
+            it.write("</p>")
+        }
         it.newLine()
         it.write("</body>")
         it.newLine()
