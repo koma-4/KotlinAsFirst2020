@@ -102,8 +102,7 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
                 var i = 0
                 var finded = Regex(pattern).find(line.toLowerCase(), i)
                 while (i <= line.lastIndex && finded != null) {
-                    i = if (key.length == 1) finded.range.last + 1
-                    else finded.range.last
+                    i = finded.range.first + 1
                     res1.add(i)
                     finded = Regex(pattern).find(line.toLowerCase(), i)
                 }
@@ -565,6 +564,7 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     val exp = "$lhv".length - "$rhv".length
     var k = 0
     var s = 0
+    var count1 = 1
     if (lhv.toString().length < rhv.toString().length) minus1 = lhv
     else {
         when {
@@ -600,7 +600,8 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     else writer.write(" ".repeat(size - deli))
     val ans1 = lhv / rhv
     writer.write("$ans1")
-    fun append(lhv: Int, rhv: Int) {
+    while (count1 == 1) {
+        count1 = 0
         condition++
         writer.newLine()
         if (condition != 1) writer.write(" ".repeat(deli2))
@@ -627,6 +628,7 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
         }
         if (k > 0) {
             k -= 1
+            count1 = 1
             writer.newLine()
             deli2 = deli2 + "$newDigit".length - "$minus".length - 1
             writer.write(" ".repeat(deli2))
@@ -635,10 +637,8 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
             else "$newDigit".length
             minus1 = newDigit - minus
             if ("$newDigit".length > "-$minus".length) deli2 -= "$newDigit".length - "-$minus".length
-            append(lhv, rhv)
         }
     }
-    if (condition == 0) append(lhv, rhv)
     writer.close()
 }
 
