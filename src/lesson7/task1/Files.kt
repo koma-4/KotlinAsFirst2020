@@ -609,7 +609,8 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     while (count1 == 1) {
         count1 = 0
         writer.newLine()
-        if (s == 0 && check != 0 && deli - "$lhv".length < 1) writer.write(" ")
+        if (s == 0 && check != 0 && deli - "$lhv".length < 1 && "${(lhv / 10.0.pow(k - 1)).toInt()}".length != "-$minus".length)
+            writer.write(" ")
         writer.write("-".repeat(deli).padStart("${(lhv / 10.0.pow(k)).toInt()}".length))
         check++
         val newDigit: Int = if (k > 0)
@@ -634,7 +635,8 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
             k -= 1
             count1 = 1
             writer.newLine()
-            if (s == 0 && "$minus".length != "$lhv".length) writer.write(" ")
+            if (s == 0 && "$minus".length != "$lhv".length && "-$minus".length != "${(lhv / 10.0.pow(k - 1)).toInt()}".length)
+                writer.write(" ")
             writer.write("-$minus".padStart("${(lhv / 10.0.pow(k)).toInt()}".length))
             deli = if ("$newDigit".length <= "-$minus".length) "-$minus".length
             else "$newDigit".length
