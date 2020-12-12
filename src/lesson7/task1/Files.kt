@@ -565,53 +565,53 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     val writer = File(outputName).bufferedWriter()
     var minus = 0
     var minus1: Int
-    var condition = 0
-    var deli2 = 0
     val exp = "$lhv".length - "$rhv".length
     var k = 0
     var s = 0
     var count1 = 1
+    var firstOne = 0
+    var check = 0
     if (lhv.toString().length < rhv.toString().length) minus1 = lhv
     else {
         when {
             rhv > lhv -> {
+                firstOne = lhv
                 minus = 0
                 minus1 = lhv
             }
             rhv > lhv / 10.0.pow(exp) -> {
-                minus = (lhv / 10.0.pow(exp - 1) / rhv).toInt() * rhv
-                minus1 = (lhv / 10.0.pow(exp - 1) - minus).toInt()
+                firstOne = lhv / 10.0.pow(exp - 1).toInt()
+                minus = (firstOne / rhv) * rhv
+                minus1 = firstOne - minus
                 k = exp - 1
             }
             else -> {
-                minus = (lhv / 10.0.pow(exp) / rhv).toInt() * rhv
-                minus1 = (lhv / 10.0.pow(exp) - minus).toInt()
+                firstOne = lhv / 10.0.pow(exp).toInt()
+                minus = (firstOne / rhv) * rhv
+                minus1 = firstOne - minus
                 k = exp
             }
         }
     }
-    if ("$lhv".length > "-$minus".length && rhv > lhv || lhv / rhv < 10 && "$lhv".length == "-$minus".length) {
+    if ("$lhv".length > "-$minus".length && rhv > lhv || "$firstOne".length == "-$minus".length) {
         s++
         writer.write("$lhv | $rhv")
     } else writer.write(" $lhv | $rhv")
-    val size = if ("$lhv".length > "-$minus".length && rhv > lhv || s == 1) "$lhv | $rhv".length - "$rhv".length
+    val size = if (s == 1) "$lhv | $rhv".length - "$rhv".length
     else " $lhv | $rhv".length - "$rhv".length
     writer.newLine()
-    if ("$lhv".length > "-$minus".length && rhv > lhv || s == 1)
-        writer.write(" ".repeat("$lhv".length - "-$minus".length))
-    writer.write("-$minus")
-    var deli = if (rhv > lhv && "$lhv".length > "-$minus".length || s == 1) "$lhv".length
+    if ("$lhv".length > "-$minus".length && rhv > lhv)
+        writer.write(" ".repeat("$lhv".length - "-$minus".length)
+                + "-${"$minus".padEnd(size - 1 - ("$lhv".length - "-$minus".length))}${lhv / rhv}")
+    else writer.write("-${"$minus".padEnd(size - 1)}${lhv / rhv}")
+    var deli = if ("$lhv".length > "-$minus".length && rhv > lhv) "$lhv".length
     else "-$minus".length
-    if (rhv > lhv && "$lhv".length > "-$minus".length || s == 1) writer.write(" ".repeat(size - "$lhv".length))
-    else writer.write(" ".repeat(size - deli))
-    val ans1 = lhv / rhv
-    writer.write("$ans1")
     while (count1 == 1) {
         count1 = 0
-        condition++
         writer.newLine()
-        if (condition != 1) writer.write(" ".repeat(deli2))
-        writer.write("-".repeat(deli))
+        if (s == 0 && check != 0 && deli - "$lhv".length < 1) writer.write(" ")
+        writer.write("-".repeat(deli).padStart("${(lhv / 10.0.pow(k)).toInt()}".length))
+        check++
         val newDigit: Int = if (k > 0)
             minus1 * 10 + (lhv % 10.0.pow(k) / 10.0.pow(k - 1)).toInt()
         else minus1
@@ -621,28 +621,24 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
         } else {
             newDigit / rhv * rhv
         }
-        deli2 =
-            if (minus / 10 <= (newDigit / 10) && k != 0) "$lhv".length - k + 2 - "$newDigit".length
-            else if ("$lhv".length > "-$minus".length && rhv > lhv || s == 1) "$lhv".length - k - "$newDigit".length
-            else "$lhv".length - k + 1 - "$newDigit".length
-        if (minus1 != 0 || k < 1) {
-            writer.write(" ".repeat(deli2))
-            writer.write("$newDigit")
-        } else {
-            writer.write(" ".repeat(deli2 - 1))
-            writer.write("0$newDigit")
+        if (s == 0 && deli - "$lhv".length < 2) writer.write(" ")
+        if (k == 0) {
+            k++
+            check = 0
         }
+        if (minus1 != 0 || check == 0) {
+            writer.write("$newDigit".padStart("${(lhv / 10.0.pow(k - 1)).toInt()}".length))
+        } else writer.write("0$newDigit".padStart("${(lhv / 10.0.pow(k - 1)).toInt()}".length))
+        if (check == 0) k = 0
         if (k > 0) {
             k -= 1
             count1 = 1
             writer.newLine()
-            deli2 = deli2 + "$newDigit".length - "$minus".length - 1
-            writer.write(" ".repeat(deli2))
-            writer.write("-$minus")
+            if (s == 0 && "$minus".length != "$lhv".length) writer.write(" ")
+            writer.write("-$minus".padStart("${(lhv / 10.0.pow(k)).toInt()}".length))
             deli = if ("$newDigit".length <= "-$minus".length) "-$minus".length
             else "$newDigit".length
             minus1 = newDigit - minus
-            if ("$newDigit".length > "-$minus".length) deli2 -= "$newDigit".length - "-$minus".length
         }
     }
     writer.close()
